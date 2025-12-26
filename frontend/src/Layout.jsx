@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import LeftSidebar from "./components/Sidebar";
+import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 
 const Layout = ({ children }) => {
@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar fixed */}
       <div className="shrink-0 h-full">
-        <LeftSidebar />
+        <Sidebar />
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">

@@ -10,28 +10,14 @@ import {
   Shield
 } from "lucide-react";
 
+
 const LeftSidebar = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard, roles: ["guest", "user", "restaurant", "admin"] },
-    { name: "Admin Dashboard", path: "/admin/dashboard", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Users", path: "/admin/users", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Restaurants", path: "/admin/restaurants", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Delivery Partners", path: "/admin/deliveryPartners", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Orders", path: "/admin/orders", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Reports", path: "/admin/reports", icon: LayoutDashboard, roles: ["admin"] },
-
-    { name: "Settings", path: "/settings", icon: Settings, roles: ["guest", "user", "restaurant", "admin"] },
-
-    
-    // { name: "Restaurant Dashboard", path: "/restaurantDashboard", icon: LayoutDashboard, roles: ["restaurant"] },
-    // { name: "User Management", path: "/userManagement", icon: LayoutDashboard, roles: ["admin"] },
-    // { name: "About Us", path: "/about", icon: Shield, roles: ["guest", "user", "restaurant", "admin"] },
-    // { name: "Favorites", path: "/favorites", icon: Heart, roles: ["user"] },
-    // { name: "Messages", path: "/messages", icon: MessageSquare, roles: ["user", "restaurant"] },
-    // { name: "Order History", path: "/orderHistory", icon: History, roles: ["user"] },
-    
+    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Orders", path: "/admin/orders", icon: History },
+    { name: "Products", path: "/admin/products", icon: Shield },
   ];
 
   return (
@@ -46,7 +32,6 @@ const LeftSidebar = () => {
         <nav>
           <ul>
             {navItems
-            //   .filter(item => hasAccess(item.roles))
               .map(item => (
                 <li key={item.name}>
                   <Link
