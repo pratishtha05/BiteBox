@@ -1,47 +1,39 @@
 import { Bell, ShoppingCart, X, Search, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { role, user, restaurant, admin, logout } = useAuth();
 
-  // Simple logout function
+  // Logout handler
   const handleLogout = () => {
-    // Clear all auth-related localStorage items
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("user");
-    localStorage.removeItem("restaurant");
-    localStorage.removeItem("admin");
-
-    // Redirect to homepage
-    navigate("/", { replace: true });
+    logout();
+    setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 0);
   };
 
-  // Get role and user info from localStorage to conditionally show buttons
-  const role = localStorage.getItem("role");
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const restaurant = JSON.parse(localStorage.getItem("restaurant") || "null");
-  const admin = JSON.parse(localStorage.getItem("admin") || "null");
-
   // Get display name
-  let displayName = "User";
+  let displayName = "Guest";
   if (role === "user" && user?.name) displayName = user.name;
-  else if (role === "restaurant" && restaurant?.name) displayName = restaurant.name;
-  else if (role === "admin" && admin?.name) displayName = admin.name;
+  else if (role === "restaurant" && restaurant?.name)
+    displayName = restaurant.name;
+  else if (role === "admin" && admin?.name) {
+    console.log(admin.name);
+    displayName = admin.name;
+  }
 
   return (
     <header className="w-full bg-white border-b border-gray-100 px-6 py-3 shadow-sm">
       <div className="flex items-center justify-between">
-
-        {/* Left - Greeting */}
+        {/* Greeting */}
         <h1 className="text-2xl font-bold text-gray-800">
           Hello, <span className="text-amber-500">{displayName}</span>
         </h1>
 
-        {/* Center - Search */}
-        <form
-          className="flex items-center w-105 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm"
-        >
+        {/* Search bar */}
+        <form className="flex items-center w-105 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
           <input
             type="text"
             placeholder="Search food or restaurants"
@@ -49,24 +41,60 @@ const Navbar = () => {
           />
           <button
             type="submit"
-            className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm hover:bg-amber-600 transition"
+            className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm hover:bg-amber-600 transition hover:cursor-pointer active:scale-95"
           >
             Search
           </button>
         </form>
 
-        {/* Right - Actions */}
+        {/* Actions */}
         <div className="flex items-center space-x-5">
+          {/* Logged-in icons */}
+          {role && (
+            <>
+              {/* Notifications - for all logged-in roles */}
+              <button
+                className="relative text-gray-600 hover:text-amber-500 transition"
+                title="Notifications"
+              >
+                <Bell size={24} className="hover:cursor-pointer active:scale-95"/>
+                {/* optional badge */}
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </button>
+
+              {/* Cart - ONLY for user */}
+              {role === "user" && (
+                <button
+                  className="text-gray-600 hover:text-amber-500 transition"
+                  title="Cart"
+                >
+                  <ShoppingCart size={24} className="hover:cursor-pointer active:scale-95"/>
+                </button>
+              )}
+
+              {/* User profile - ONLY for user */}
+              {role === "user" && (
+                <button
+                  className="text-gray-600 hover:text-amber-500 transition"
+                  title="Profile"
+                >
+                  <User size={24} className="hover:cursor-pointer active:scale-95"/>
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Auth buttons */}
           {!role ? (
             <Link to="/auth">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-600 transition">
-                Signup/Login
+              <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-600 transition hover:cursor-pointer active:scale-95">
+                Login / Signup
               </button>
             </Link>
           ) : (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600 transition"
+              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600 transition hover:cursor-pointer active:scale-95"
             >
               Logout
             </button>

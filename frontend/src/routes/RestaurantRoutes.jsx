@@ -4,28 +4,28 @@ import Layout from "../Layout"
 
 import ProtectedRoutes from "./ProtectedRoutes";
 
-import AdminDashboard from "../pages/admin/AdminDashboard";
+import RestaurantDashboard from "../pages/restaurant/RestaurantDashboard";
 
-const AdminRoutes = () => {
+const RestaurantRoutes = () => {
   return (
     <Routes>
       <Route
-        element={<ProtectedRoutes allowedRoles={["admin"]} />}
+        element={<ProtectedRoutes allowedRoles={["restaurant"]} />}
       >
         <Route
           path="dashboard"
           element={
             <Layout>
-              <AdminDashboard />
+              <RestaurantDashboard />
             </Layout>
           }
         />
       </Route>
 
-      {/* redirect any unmatched route */}
+      {/*redirect any unmatched route */}
       <Route path="*" element={<Navigate to="/auth" replace />} />
     </Routes>
   );
 };
 
-export default AdminRoutes;
+export default RestaurantRoutes;
