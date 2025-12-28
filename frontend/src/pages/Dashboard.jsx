@@ -1,30 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const [restaurants, setRestaurants] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/public/restaurants"
+        );
+        setRestaurants(res.data.restaurants);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchRestaurants();
+  }, []);
 
   return (
-    <div className="flex flex-row">
-      <div className="p-4 w-full">
-        {/* CATEGORIES */}
-        <div className="mb-10">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Category</h3>
-          <div className="flex justify-between space-x-4">
-            categories go here
-          </div>
-        </div>
+    <div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <h1 className="text-xl font-semibold text-gray-900 mb-6">
+          Explore Restaurants
+        </h1>
 
-        {/* RESTAURANTS */}
-        <div className="mt-10">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-800">Restaurants</h3>
-            <span className="text-sm text-gray-500">
-              x restaurants available
-            </span>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {restaurants.map((restaurant) => (
+            <div
+              key={restaurant._id}
+              onClick={() => navigate(`/restaurant/${restaurant._id}`)}
+              className="cursor-pointer rounded-2xl bg-white shadow-md overflow-hidden 
+                         transition-transform transform hover:scale-101 hover:shadow-xl"
+            >
+              {/* Restaurant Image */}
+              <img
+                src={restaurant.image || "/placeholder-restaurant.jpg"}
+                alt={restaurant.name}
+                className="w-full h-40 object-cover"
+              />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            restaurants go here
-          </div>
+              {/* Restaurant Name */}
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {restaurant.name}
+                </h3>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

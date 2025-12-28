@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // Load auth data from localStorage on app start
+  // ---------------- LOAD FROM LOCALSTORAGE ----------------
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedRole = localStorage.getItem("role");
@@ -23,11 +23,23 @@ export const AuthProvider = ({ children }) => {
       setRole(storedRole);
 
       if (storedRole === "user") {
-        setUser(JSON.parse(localStorage.getItem("user")));
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        setUser({
+          ...storedUser,
+          isBlocked: storedUser?.isBlocked || false,
+          blockReason: storedUser?.blockReason || "",
+        });
       }
+
       if (storedRole === "restaurant") {
-        setRestaurant(JSON.parse(localStorage.getItem("restaurant")));
+        const storedRestaurant = JSON.parse(localStorage.getItem("restaurant"));
+        setRestaurant({
+          ...storedRestaurant,
+          isBlocked: storedRestaurant?.isBlocked || false,
+          blockReason: storedRestaurant?.blockReason || "",
+        });
       }
+
       if (storedRole === "admin") {
         setAdmin(JSON.parse(localStorage.getItem("admin")));
       }
@@ -36,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Login handler
+  // ---------------- LOGIN ----------------
   const login = async (role, payload) => {
     try {
       const res = await axios.post(
@@ -46,21 +58,45 @@ export const AuthProvider = ({ children }) => {
 
       const { token, user, restaurant, admin } = res.data;
 
+      // Blocked checks
+      if (role === "restaurant" && restaurant?.isBlocked) {
+  throw new Error(`Restaurant is blocked: ${restaurant.blockReason}`);
+}
+
+if (role === "user" && user?.isBlocked) {
+  throw new Error(`Your account is blocked: ${user.blockReason}`);
+}
+
+
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
 
       setToken(token);
       setRole(role);
 
-      if (role === "user") {
-        localStorage.setItem("user", JSON.stringify(user));
-        setUser(user);
-      }
+      if (role === "user" && user) {
+  const newUser = {
+    ...user,
+    isBlocked: user?.isBlocked || false,
+    blockReason: user?.blockReason || "",
+  };
 
-      if (role === "restaurant") {
-        localStorage.setItem("restaurant", JSON.stringify(restaurant));
-        setRestaurant(restaurant);
-      }
+  localStorage.setItem("user", JSON.stringify(newUser));
+  setUser(newUser);
+}
+
+
+      if (role === "restaurant" && restaurant) {
+  const newRestaurant = {
+    ...restaurant,
+    isBlocked: restaurant?.isBlocked || false,
+    blockReason: restaurant?.blockReason || "",
+  };
+
+  localStorage.setItem("restaurant", JSON.stringify(newRestaurant));
+  setRestaurant(newRestaurant);
+}
+
 
       if (role === "admin") {
         localStorage.setItem("admin", JSON.stringify(admin));
@@ -72,12 +108,13 @@ export const AuthProvider = ({ children }) => {
       throw new Error(
         err?.response?.data?.message ||
           err?.response?.data?.errors?.[0]?.msg ||
+          err.message ||
           "Login failed"
       );
     }
   };
 
-  // Logout handler
+  // ---------------- LOGOUT ----------------
   const logout = () => {
     localStorage.clear();
 
@@ -88,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     setAdmin(null);
   };
 
-  // Signup handler
+  // ---------------- SIGNUP ----------------
   const signup = async (role, payload) => {
     if (role === "admin") throw new Error("Admin cannot signup");
 
@@ -98,8 +135,8 @@ export const AuthProvider = ({ children }) => {
         payload
       );
 
-      // Automatically log in the user after signup
-      login({ ...res.data, role });
+      // Auto login after signup
+      await login(role, payload);
 
       return res.data;
     } catch (err) {
@@ -109,7 +146,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Helpers
+  // ---------------- HELPERS ----------------
   const isAuthenticated = !!token;
 
   const hasRole = (allowedRoles) => {

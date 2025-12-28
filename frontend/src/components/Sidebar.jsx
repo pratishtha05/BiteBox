@@ -40,15 +40,12 @@ const LeftSidebar = () => {
 
   // Admin nav
   const adminNav = [
+    { name: "Dashboard", path: "/", icon: LayoutDashboard },
     { name: "Admin Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Users", path: "/admin/users", icon: User },
     { name: "Restaurants", path: "/admin/restaurants", icon: Shield },
-    { name: "Delivery Partners", path: "/admin/delivery-partners", icon: Shield },
-    { name: "Orders", path: "/admin/orders", icon: History },
-    { name: "Approvals", path: "/admin/approvals", icon: CheckCircle },
-    { name: "Complaints", path: "/admin/complaints", icon: AlertTriangle },
-    { name: "Reports", path: "/admin/reports", icon: BarChart },
-    { name: "Settings", path: "/admin/settings", icon: Settings },
+    { name: "Delivery Partners", path: "/admin/deliveryPartners", icon: Shield },
+    { name: "Settings", path: "/settings", icon: Settings },
   ];
 
   // Pick nav items based on role

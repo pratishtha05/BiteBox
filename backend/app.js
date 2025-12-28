@@ -22,6 +22,16 @@ app.use('/admin', adminRouter);
 const authRouter = require('./routes/auth.routes');
 app.use('/auth', authRouter);
 
+const userRouter = require('./routes/user.routes');
+app.use('/user', userRouter);
+
+const restaurantRouter = require('./routes/restaurant.routes');
+app.use('/restaurant', restaurantRouter);
+
+const publicRouter = require("./routes/public.routes");
+app.use("/public", publicRouter);
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });

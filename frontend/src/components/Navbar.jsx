@@ -50,37 +50,42 @@ const Navbar = () => {
         {/* Actions */}
         <div className="flex items-center space-x-5">
           {/* Logged-in icons */}
-          {role && (
+          {role === "user" && (
             <>
-              {/* Notifications - for all logged-in roles */}
+              {/* Notifications */}
               <button
                 className="relative text-gray-600 hover:text-amber-500 transition"
                 title="Notifications"
               >
-                <Bell size={24} className="hover:cursor-pointer active:scale-95"/>
+                <Bell
+                  size={24}
+                  className="hover:cursor-pointer active:scale-95"
+                />
                 {/* optional badge */}
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
               </button>
 
-              {/* Cart - ONLY for user */}
-              {role === "user" && (
-                <button
-                  className="text-gray-600 hover:text-amber-500 transition"
-                  title="Cart"
-                >
-                  <ShoppingCart size={24} className="hover:cursor-pointer active:scale-95"/>
-                </button>
-              )}
+              {/* Cart */}
+              <button
+                className="text-gray-600 hover:text-amber-500 transition"
+                title="Cart"
+              >
+                <ShoppingCart
+                  size={24}
+                  className="hover:cursor-pointer active:scale-95"
+                />
+              </button>
 
-              {/* User profile - ONLY for user */}
-              {role === "user" && (
-                <button
-                  className="text-gray-600 hover:text-amber-500 transition"
-                  title="Profile"
-                >
-                  <User size={24} className="hover:cursor-pointer active:scale-95"/>
-                </button>
-              )}
+              {/* Profile */}
+              <button
+                className="text-gray-600 hover:text-amber-500 transition"
+                title="Profile"
+              >
+                <User
+                  size={24}
+                  className="hover:cursor-pointer active:scale-95"
+                />
+              </button>
             </>
           )}
 
