@@ -1,20 +1,20 @@
 const express = require("express");
 const router = express.Router();
-
 const Restaurant = require("../models/restaurant.model");
 
-/**
- * GET /public/restaurants
- * Public: Get all active (non-blocked) restaurants
- */
 router.get("/restaurants", async (req, res) => {
   try {
-    const restaurants = await Restaurant.find(
-      { isBlocked: false },
-      "-password"
-    ).sort({ createdAt: -1 });
+    const filter = { isBlocked: false };
 
-    res.json({
+    if (req.query.category) {
+      filter.categories = req.query.category.toLowerCase().trim();
+    }
+
+    const restaurants = await Restaurant.find(filter)
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
       count: restaurants.length,
       restaurants,
     });

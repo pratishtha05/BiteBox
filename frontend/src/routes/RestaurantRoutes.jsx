@@ -5,6 +5,8 @@ import Layout from "../Layout"
 import ProtectedRoutes from "./ProtectedRoutes";
 
 import RestaurantDashboard from "../pages/restaurant/RestaurantDashboard";
+import Orders from "../pages/restaurant/Orders";
+import Menu from "../pages/restaurant/Menu";
 
 const RestaurantRoutes = () => {
   return (
@@ -17,6 +19,22 @@ const RestaurantRoutes = () => {
           element={
             <Layout>
               <RestaurantDashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <Layout>
+              <Orders />
+            </Layout>
+          }
+        />
+        <Route
+          path="menu"
+          element={
+            <Layout>
+              <Menu />
             </Layout>
           }
         />

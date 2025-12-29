@@ -24,18 +24,18 @@ router.put("/update", auth, async (req, res) => {
   if (req.auth.role !== "restaurant")
     return res.status(403).json({ message: "Forbidden" });
 
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, categories } = req.body;
 
   const updatedRestaurant = await Restaurant.findByIdAndUpdate(
     req.auth.id,
-    { name, email, phone, address },
+    { name, email, phone, address, categories },
     { new: true }
   ).select("-password");
 
-  if (restaurant.isBlocked) {
+  if (updatedRestaurant.isBlocked) {
     return res
       .status(403)
-      .json({ message: `Account blocked: ${restaurant.blockReason}` });
+      .json({ message: `Account blocked: ${updatedRestaurant.blockReason}` });
   }
 
   res.json(updatedRestaurant);
@@ -81,6 +81,50 @@ router.delete("/delete", auth, async (req, res) => {
   }
 
   res.json({ message: "Restaurant account deleted" });
+});
+
+// GET /restaurant/dashboard
+router.get("/dashboard", auth, async (req, res) => {
+  try {
+    // Only allow restaurant users
+    if (req.auth.role !== "restaurant") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const restaurantId = req.auth.restaurantId; // assuming this is stored in token
+
+    // Fetch stats concurrently
+    const [totalOrders, totalRevenue, totalMenuItems] = await Promise.all([
+      Order.countDocuments({ restaurantId }),
+      Order.aggregate([
+        { $match: { restaurantId } },
+        { $group: { _id: null, total: { $sum: "$total" } } },
+      ]),
+      MenuItem.countDocuments({ restaurantId }),
+    ]);
+
+    // Recent orders (last 5)
+    const recentOrders = await Order.find({ restaurantId })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("customerName total status");
+
+    // Format revenue
+    const revenueValue =
+      totalRevenue.length > 0 ? totalRevenue[0].total : 0;
+
+    res.json({
+      stats: {
+        totalOrders,
+        revenue: revenueValue,
+        totalMenuItems,
+      },
+      recentOrders,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
 module.exports = router;

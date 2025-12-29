@@ -14,7 +14,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { login, signup} = useAuth();
 
   const [step, setStep] = useState("role");
   const [isSignup, setIsSignup] = useState(true);
@@ -31,7 +31,15 @@ const Auth = () => {
     gender: "",
     restaurantId: "",
     address: "",
+    categories: [],
   });
+
+  const CATEGORY_OPTIONS = [
+    { label: "Indian", value: "indian" },
+    { label: "Chinese", value: "chinese" },
+    { label: "Fast Food", value: "fast food" },
+    { label: "Bakery", value: "bakery" },
+  ];
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,38 +50,42 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Build payload based on role
-      let payload = {};
-      if (formData.role === "user") {
-        payload = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-          gender: formData.gender,
-        };
-      } else if (formData.role === "restaurant") {
-        payload = {
-          restaurantId: formData.restaurantId,
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-          address: formData.address,
-        };
-      } else if (formData.role === "admin") {
-        payload = {
-          email: formData.email,
-          password: formData.password,
-        };
+      // ---------- FRONTEND VALIDATION ----------
+      if (
+        isSignup &&
+        formData.role === "restaurant" &&
+        formData.categories.length === 0
+      ) {
+        throw new Error("Please select at least one category");
       }
 
-      if (isSignup) {
-        if (formData.role === "admin") {
-          setError("Admin cannot signup");
-          return;
-        }
+      // ---------- PREPARE PAYLOAD ----------
+      const payload =
+        isSignup && formData.role === "restaurant"
+          ? {
+              restaurantId: formData.restaurantId,
+              name: formData.name,
+              email: formData.email,
+              password: formData.password,
+              phone: formData.phone,
+              address: formData.address,
+              categories: formData.categories, // already lowercase
+            }
+          : isSignup
+          ? {
+              name: formData.name,
+              email: formData.email,
+              password: formData.password,
+              phone: formData.phone,
+              gender: formData.gender,
+            }
+          : {
+              email: formData.email,
+              password: formData.password,
+            };
 
+      // ---------- CALL AUTH CONTEXT ----------
+      if (isSignup) {
         await signup(formData.role, payload);
       } else {
         await login(formData.role, payload);
@@ -85,14 +97,9 @@ const Auth = () => {
       else if (formData.role === "restaurant")
         navigate("/restaurant/dashboard", { replace: true });
       else navigate("/", { replace: true });
+
     } catch (err) {
-      console.log(err.response?.data);
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.errors?.[0]?.msg ||
-          err.message ||
-          "Something went wrong"
-      );
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -266,6 +273,48 @@ const Auth = () => {
                       onChange={handleChange}
                       className="w-full mt-1 px-4 py-2 border rounded-lg"
                     />
+                    <label className="text-sm font-medium">
+                      Categories <span className="text-amber-600">*</span>
+                    </label>
+
+                    <div className="flex flex-wrap gap-3 pt-2">
+                      {CATEGORY_OPTIONS.map((category) => {
+                        const selected = formData.categories.includes(
+                          category.value
+                        );
+
+                        return (
+                          <button
+                            type="button"
+                            key={category.value}
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                categories: selected
+                                  ? prev.categories.filter(
+                                      (c) => c !== category.value
+                                    )
+                                  : [...prev.categories, category.value],
+                              }));
+                            }}
+                            className={`px-4 py-2 rounded-full border text-sm font-medium transition hover:cursor-pointer
+          ${
+            selected
+              ? "bg-amber-500 text-white border-amber-500 active:scale-95"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:scale-95"
+          }`}
+                          >
+                            {category.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {formData.categories.length === 0 && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        Select at least one category
+                      </p>
+                    )}
                   </>
                 )}
               </>

@@ -171,6 +171,7 @@ const Restaurants = () => {
                   <p>
                     <strong>Address:</strong> {restaurant.address}
                   </p>
+                  <p><strong>Categories:</strong> {restaurant.categories.join(", ")}</p>
                 </div>
               )}
             </div>

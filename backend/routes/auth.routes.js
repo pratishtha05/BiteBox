@@ -108,6 +108,9 @@ router.post(
       .withMessage("Password must be at least 6 characters"),
     body("phone").notEmpty().withMessage("Phone is required"),
     body("address").notEmpty().withMessage("Address is required"),
+    body("categories")
+      .isArray({ min: 1 })
+      .withMessage("At least one category is required"),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -115,7 +118,15 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
 
     try {
-      const { restaurantId, name, email, password, phone, address } = req.body;
+      const {
+        restaurantId,
+        name,
+        email,
+        password,
+        phone,
+        address,
+        categories,
+      } = req.body;
 
       const existingRestaurant = await Restaurant.findOne({
         $or: [{ email }, { restaurantId: Number(restaurantId) }],
@@ -129,6 +140,10 @@ router.post(
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      const normalizedCategories = categories.map((c) =>
+        c.toLowerCase().trim()
+      );
+
       const restaurant = await Restaurant.create({
         restaurantId: Number(restaurantId),
         name,
@@ -136,6 +151,7 @@ router.post(
         password: hashedPassword,
         phone,
         address,
+        categories: normalizedCategories,
       });
 
       const token = jwt.sign(

@@ -60,13 +60,12 @@ export const AuthProvider = ({ children }) => {
 
       // Blocked checks
       if (role === "restaurant" && restaurant?.isBlocked) {
-  throw new Error(`Restaurant is blocked: ${restaurant.blockReason}`);
-}
+        throw new Error(`Restaurant is blocked: ${restaurant.blockReason}`);
+      }
 
-if (role === "user" && user?.isBlocked) {
-  throw new Error(`Your account is blocked: ${user.blockReason}`);
-}
-
+      if (role === "user" && user?.isBlocked) {
+        throw new Error(`Your account is blocked: ${user.blockReason}`);
+      }
 
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
@@ -75,28 +74,26 @@ if (role === "user" && user?.isBlocked) {
       setRole(role);
 
       if (role === "user" && user) {
-  const newUser = {
-    ...user,
-    isBlocked: user?.isBlocked || false,
-    blockReason: user?.blockReason || "",
-  };
+        const newUser = {
+          ...user,
+          isBlocked: user?.isBlocked || false,
+          blockReason: user?.blockReason || "",
+        };
 
-  localStorage.setItem("user", JSON.stringify(newUser));
-  setUser(newUser);
-}
-
+        localStorage.setItem("user", JSON.stringify(newUser));
+        setUser(newUser);
+      }
 
       if (role === "restaurant" && restaurant) {
-  const newRestaurant = {
-    ...restaurant,
-    isBlocked: restaurant?.isBlocked || false,
-    blockReason: restaurant?.blockReason || "",
-  };
+        const newRestaurant = {
+          ...restaurant,
+          isBlocked: restaurant?.isBlocked || false,
+          blockReason: restaurant?.blockReason || "",
+        };
 
-  localStorage.setItem("restaurant", JSON.stringify(newRestaurant));
-  setRestaurant(newRestaurant);
-}
-
+        localStorage.setItem("restaurant", JSON.stringify(newRestaurant));
+        setRestaurant(newRestaurant);
+      }
 
       if (role === "admin") {
         localStorage.setItem("admin", JSON.stringify(admin));

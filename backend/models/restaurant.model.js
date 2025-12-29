@@ -27,6 +27,12 @@ const restaurantSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  categories: {
+    type: [String],
+    required: true,
+    set: (categories) => categories.map((c) => c.toLowerCase().trim()),
+  },
+
   isBlocked: {
     type: Boolean,
     default: false,

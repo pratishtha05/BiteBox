@@ -7,7 +7,7 @@ import Auth from "./pages/Auth.jsx";
 import RestaurantMenu from "./pages/RestaurantMenu.jsx";
 
 import AdminRoutes from "./routes/AdminRoutes.jsx";
-import RestaurantRoutes from "./routes/restaurantRoutes.jsx";
+import RestaurantRoutes from "./routes/RestaurantRoutes.jsx";
 import Settings from "./pages/Settings.jsx";
 
 const Router = () => {
@@ -36,7 +36,7 @@ const Router = () => {
         />
 
         <Route
-          path="/restaurant/:id"
+          path="/menu/:id"
           element={
             <Layout>
               <RestaurantMenu />

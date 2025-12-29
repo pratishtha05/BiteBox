@@ -33,9 +33,10 @@ const LeftSidebar = () => {
 
   // Restaurant nav
   const restaurantNav = [
-    { name: "Dashboard", path: "/restaurant/dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Restaurant Dashboard", path: "/restaurant/dashboard", icon: LayoutDashboard },
     { name: "Orders", path: "/restaurant/orders", icon: History },
-    { name: "Products", path: "/restaurant/products", icon: Shield },
+    { name: "Menu", path: "/restaurant/menu", icon: Shield },
   ];
 
   // Admin nav
