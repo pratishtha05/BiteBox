@@ -31,6 +31,14 @@ app.use('/restaurant', restaurantRouter);
 const publicRouter = require("./routes/public.routes");
 app.use("/public", publicRouter);
 
+const menuRouter = require("./routes/menu.routes");
+app.use("/menu", menuRouter);
+
+const orderRouter = require("./routes/order.routes");
+app.use("/order", orderRouter);
+
+const cartRouter = require("./routes/cart.routes");
+app.use("/cart", cartRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

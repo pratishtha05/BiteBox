@@ -1,73 +1,77 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-
-const dummyMenu = [
-  {
-    id: 1,
-    name: "Margherita Pizza",
-    description: "Classic cheese and tomato pizza with fresh basil.",
-    image: "https://source.unsplash.com/600x400/?pizza",
-    price: 10,
-  },
-  {
-    id: 2,
-    name: "Cheeseburger",
-    description: "Juicy beef patty with cheddar, lettuce, and tomato.",
-    image: "https://source.unsplash.com/600x400/?burger",
-    price: 8,
-  },
-  {
-    id: 3,
-    name: "Sushi Platter",
-    description: "Fresh sushi rolls with salmon, tuna, and avocado.",
-    image: "https://source.unsplash.com/600x400/?sushi",
-    price: 15,
-  },
-  {
-    id: 4,
-    name: "Pasta Carbonara",
-    description: "Creamy pasta with pancetta and parmesan cheese.",
-    image: "https://source.unsplash.com/600x400/?pasta",
-    price: 12,
-  },
-];
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const RestaurantMenu = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { restaurantId } = useParams();
+  const [menu, setMenu] = useState([]);
+  const { addToCart, restaurantId: cartRestaurantId } = useCart();
+  const { isAuthenticated, role } = useAuth();
+
+  useEffect(() => {
+    if (!restaurantId) return;
+
+    const fetchMenu = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/menu/restaurant/${restaurantId}`
+        );
+        setMenu(res.data);
+      } catch (err) {
+        console.error(err.response?.data || err.message);
+      }
+    };
+
+    fetchMenu();
+  }, [restaurantId]);
+
+  const handleAddToCart = (item) => {
+    if (!isAuthenticated || role !== "user") return;
+
+    addToCart(
+      {
+        menuItem: item._id,
+        name: item.name,
+        price: item.price,
+      },
+      restaurantId
+    );
+  };
 
   return (
-    <div className="p-6 flex flex-col gap-6">
-      {dummyMenu.map((item) => (
-        <div
-          key={item.id}
-          onClick={() => navigate(`/restaurant/${id}/menu/${item.id}`)}
-          className="flex flex-col sm:flex-row w-full bg-white rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden border border-gray-200 hover:border-amber-500"
-        >
-          {/* Image */}
-          <div className="w-full sm:w-1/3 h-64 sm:h-auto">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
+    <div className="max-w-6xl mx-auto p-6">
+      <h2 className="text-2xl font-semibold mb-6">Menu</h2>
 
-          {/* Details */}
-          <div className="p-6 flex flex-col justify-between w-full sm:w-2/3">
+      <div className="grid md:grid-cols-3 gap-6">
+        {menu.map((item) => (
+          <div
+            key={item._id}
+            className="bg-white rounded-xl shadow p-4 flex flex-col justify-between"
+          >
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">{item.name}</h2>
-              <p className="text-gray-600 mt-1">{item.description}</p>
+              <h3 className="font-medium text-lg capitalize">{item.name}</h3>
+              <p className="text-sm text-gray-500">{item.description}</p>
+              <p className="font-semibold mt-2">₹{item.price}</p>
             </div>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-amber-500 font-bold text-lg">${item.price}</span>
-              <button className="bg-amber-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-600 transition">
-                Add to Cart
-              </button>
-            </div>
+
+            <button
+              onClick={() => handleAddToCart(item)}
+              disabled={!isAuthenticated || role !== "user"}
+              className={`mt-4 py-2 rounded transition
+                ${
+                  !isAuthenticated || role !== "user"
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-amber-500 text-white hover:bg-amber-600 hover:cursor-pointer active:scale-95"
+                }
+              `}
+            >
+              Add to Cart
+            </button>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

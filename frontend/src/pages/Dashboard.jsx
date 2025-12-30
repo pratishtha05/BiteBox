@@ -41,10 +41,7 @@ const Dashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">
-        Explore Restaurants
-      </h1>
-
+      
       {/* ---------------- CATEGORIES ---------------- */}
       <div className="mb-10">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Categories</h3>

@@ -1,10 +1,18 @@
-import { Bell, ShoppingCart, X, Search, User } from "lucide-react";
+import { useState } from "react";
+import { Bell, ShoppingCart, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import Cart from "./Cart";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { role, user, restaurant, admin, logout } = useAuth();
+  const { cart } = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   // Logout handler
   const handleLogout = () => {
@@ -14,15 +22,11 @@ const Navbar = () => {
     }, 0);
   };
 
-  // Get display name
+  // Display name
   let displayName = "Guest";
   if (role === "user" && user?.name) displayName = user.name;
-  else if (role === "restaurant" && restaurant?.name)
-    displayName = restaurant.name;
-  else if (role === "admin" && admin?.name) {
-    console.log(admin.name);
-    displayName = admin.name;
-  }
+  else if (role === "restaurant" && restaurant?.name) displayName = restaurant.name;
+  else if (role === "admin" && admin?.name) displayName = admin.name;
 
   return (
     <header className="w-full bg-white border-b border-gray-100 px-6 py-3 shadow-sm">
@@ -32,16 +36,25 @@ const Navbar = () => {
           Hello, <span className="text-amber-500">{displayName}</span>
         </h1>
 
-        {/* Search bar */}
-        <form className="flex items-center w-105 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+        {/* Search */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!searchQuery.trim()) return;
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+          }}
+          className="flex items-center w-105 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm"
+        >
           <input
             type="text"
             placeholder="Search food or restaurants"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1 outline-none text-sm text-gray-700"
           />
           <button
             type="submit"
-            className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm hover:bg-amber-600 transition hover:cursor-pointer active:scale-95"
+            className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm hover:bg-amber-600 hover:cursor-pointer active:scale-95 transition"
           >
             Search
           </button>
@@ -49,57 +62,55 @@ const Navbar = () => {
 
         {/* Actions */}
         <div className="flex items-center space-x-5">
-          {/* Logged-in icons */}
           {role === "user" && (
             <>
               {/* Notifications */}
               <button
-                className="relative text-gray-600 hover:text-amber-500 transition"
+                className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Notifications"
               >
-                <Bell
-                  size={24}
-                  className="hover:cursor-pointer active:scale-95"
-                />
-                {/* optional badge */}
+                <Bell size={24} />
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
               </button>
 
               {/* Cart */}
               <button
-                className="text-gray-600 hover:text-amber-500 transition"
+                className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Cart"
+                onClick={() => setCartOpen(true)}
               >
-                <ShoppingCart
-                  size={24}
-                  className="hover:cursor-pointer active:scale-95"
-                />
+                <ShoppingCart size={24} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </button>
 
               {/* Profile */}
               <button
-                className="text-gray-600 hover:text-amber-500 transition"
+                className="text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Profile"
               >
-                <User
-                  size={24}
-                  className="hover:cursor-pointer active:scale-95"
-                />
+                <User size={24} />
               </button>
+
+              {/* Cart Sidebar */}
+              <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
             </>
           )}
 
           {/* Auth buttons */}
           {!role ? (
             <Link to="/auth">
-              <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-600 transition hover:cursor-pointer active:scale-95">
+              <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-600 hover:cursor-pointer active:scale-95 transition">
                 Login / Signup
               </button>
             </Link>
           ) : (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600 transition hover:cursor-pointer active:scale-95"
+              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600 hover:cursor-pointer active:scale-95 transition"
             >
               Logout
             </button>
