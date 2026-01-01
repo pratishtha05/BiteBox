@@ -8,6 +8,7 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/user.model");
 const Restaurant = require("../models/restaurant.model");
 const Admin = require("../models/admin.model");
+const DeliveryPartner = require("../models/deliveryPartner.model");
 
 // Environment variable for JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -253,5 +254,54 @@ router.post(
     }
   }
 );
+
+
+router.post("/delivery/signup", async (req, res) => {
+  const { name, email, password, phone } = req.body;
+
+  const existing = await DeliveryPartner.findOne({ email });
+  if (existing) {
+    return res.status(400).json({ message: "Delivery partner already exists" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const delivery = await DeliveryPartner.create({
+    name,
+    email,
+    password: hashedPassword,
+    phone,
+  });
+
+  const token = jwt.sign(
+    { id: delivery._id, role: "delivery" },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.status(201).json({ delivery, token, role: "delivery" });
+});
+
+router.post("/delivery/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const delivery = await DeliveryPartner.findOne({ email });
+  if (!delivery) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const isMatch = await bcrypt.compare(password, delivery.password);
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const token = jwt.sign(
+    { id: delivery._id, role: "delivery" },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ delivery, token, role: "delivery" });
+});
 
 module.exports = router;

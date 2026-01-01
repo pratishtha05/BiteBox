@@ -40,6 +40,9 @@ app.use("/order", orderRouter);
 const cartRouter = require("./routes/cart.routes");
 app.use("/cart", cartRouter);
 
+const deliveryRouter = require("./routes/delivery.routes");
+app.use("/delivery-partners", deliveryRouter);
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });

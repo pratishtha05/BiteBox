@@ -8,6 +8,9 @@ import RestaurantDashboard from "../pages/restaurant/RestaurantDashboard";
 import Orders from "../pages/restaurant/Orders";
 import Menu from "../pages/restaurant/Menu";
 
+import DeliveryPartners from "../pages/restaurant/DeliveryPartners";
+import DeliveryPartnerOrders from "../pages/restaurant/DeliveryPartnerOrders";
+
 const RestaurantRoutes = () => {
   return (
     <Routes>
@@ -39,6 +42,10 @@ const RestaurantRoutes = () => {
           }
         />
       </Route>
+
+      <Route path="delivery-partners" element={<Layout><DeliveryPartners /></Layout>} />
+      <Route path="delivery-partner/:partnerId/orders" element={<Layout><DeliveryPartnerOrders /></Layout>} />
+
 
       {/*redirect any unmatched route */}
       <Route path="*" element={<Navigate to="/auth" replace />} />

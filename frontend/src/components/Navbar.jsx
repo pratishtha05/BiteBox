@@ -7,14 +7,13 @@ import Cart from "./Cart";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { role, user, restaurant, admin, logout } = useAuth();
+  const { role, user, restaurant, admin, delivery, logout } = useAuth(); // added delivery
   const { cart } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Logout handler
   const handleLogout = () => {
     logout();
     setTimeout(() => {
@@ -22,16 +21,16 @@ const Navbar = () => {
     }, 0);
   };
 
-  // Display name
+  // Display name based on role
   let displayName = "Guest";
   if (role === "user" && user?.name) displayName = user.name;
   else if (role === "restaurant" && restaurant?.name) displayName = restaurant.name;
   else if (role === "admin" && admin?.name) displayName = admin.name;
+  else if (role === "delivery" && delivery?.name) displayName = delivery.name; // delivery partner
 
   return (
     <header className="w-full bg-white border-b border-gray-100 px-6 py-3 shadow-sm">
       <div className="flex items-center justify-between">
-        {/* Greeting */}
         <h1 className="text-2xl font-bold text-gray-800">
           Hello, <span className="text-amber-500">{displayName}</span>
         </h1>
@@ -60,11 +59,9 @@ const Navbar = () => {
           </button>
         </form>
 
-        {/* Actions */}
         <div className="flex items-center space-x-5">
           {role === "user" && (
             <>
-              {/* Notifications */}
               <button
                 className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Notifications"
@@ -73,7 +70,6 @@ const Navbar = () => {
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
               </button>
 
-              {/* Cart */}
               <button
                 className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Cart"
@@ -87,7 +83,6 @@ const Navbar = () => {
                 )}
               </button>
 
-              {/* Profile */}
               <button
                 className="text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
                 title="Profile"
@@ -95,12 +90,10 @@ const Navbar = () => {
                 <User size={24} />
               </button>
 
-              {/* Cart Sidebar */}
               <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
             </>
           )}
 
-          {/* Auth buttons */}
           {!role ? (
             <Link to="/auth">
               <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-600 hover:cursor-pointer active:scale-95 transition">

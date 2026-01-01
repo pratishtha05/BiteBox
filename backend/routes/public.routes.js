@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/restaurant.model");
 const MenuItem = require("../models/menu.model");
+const Contact = require("../models/contact.model");
 
 router.get("/restaurants", async (req, res) => {
   try {
@@ -81,6 +82,26 @@ router.get("/:restaurantId", async (req, res) => {
   });
 
   res.json(items);
+});
+
+router.post("/contact", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const newContact = await Contact.create({ name, email, message });
+
+    res.status(201).json({
+      message: "Your message has been received. We'll get back to you soon!",
+      contactId: newContact._id,
+    });
+  } catch (error) {
+    console.error("Contact form submission error:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
 });
 
 module.exports = router;

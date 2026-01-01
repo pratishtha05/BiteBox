@@ -33,7 +33,17 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "accepted", "preparing", "completed", "cancelled"],
       default: "pending",
     },
-  },
+    deliveryPartner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "deliveryPartner",
+      default: null,
+    },
+    deliveryStatus: {
+      type: String,
+      enum: ["unassigned", "assigned", "picked_up", "on_the_way", "delivered"],
+      default: "unassigned",
+    },
+  },  
   { timestamps: true }
 );
 

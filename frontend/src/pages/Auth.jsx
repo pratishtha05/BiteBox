@@ -4,6 +4,7 @@ import {
   User,
   Store,
   Shield,
+  Truck, // lucide-react icon for delivery
   ArrowLeft,
   Eye,
   EyeOff,
@@ -14,7 +15,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup} = useAuth();
+  const { login, signup } = useAuth();
 
   const [step, setStep] = useState("role");
   const [isSignup, setIsSignup] = useState(true);
@@ -35,7 +36,7 @@ const Auth = () => {
   });
 
   const CATEGORY_OPTIONS = [
-    { label: "Indian", value: "indian" },
+    { label: "North Indian", value: " north indian" },
     { label: "Chinese", value: "chinese" },
     { label: "Fast Food", value: "fast food" },
     { label: "Bakery", value: "bakery" },
@@ -60,29 +61,37 @@ const Auth = () => {
       }
 
       // ---------- PREPARE PAYLOAD ----------
-      const payload =
-        isSignup && formData.role === "restaurant"
-          ? {
-              restaurantId: formData.restaurantId,
-              name: formData.name,
-              email: formData.email,
-              password: formData.password,
-              phone: formData.phone,
-              address: formData.address,
-              categories: formData.categories, // already lowercase
-            }
-          : isSignup
-          ? {
-              name: formData.name,
-              email: formData.email,
-              password: formData.password,
-              phone: formData.phone,
-              gender: formData.gender,
-            }
-          : {
-              email: formData.email,
-              password: formData.password,
-            };
+      let payload;
+      if (isSignup) {
+        if (formData.role === "restaurant") {
+          payload = {
+            restaurantId: formData.restaurantId,
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            address: formData.address,
+            categories: formData.categories,
+          };
+        } else if (formData.role === "user") {
+          payload = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            gender: formData.gender,
+          };
+        } else if (formData.role === "delivery") {
+          payload = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          };
+        }
+      } else {
+        payload = { email: formData.email, password: formData.password };
+      }
 
       // ---------- CALL AUTH CONTEXT ----------
       if (isSignup) {
@@ -96,8 +105,9 @@ const Auth = () => {
         navigate("/admin/dashboard", { replace: true });
       else if (formData.role === "restaurant")
         navigate("/restaurant/dashboard", { replace: true });
+      else if (formData.role === "delivery")
+        navigate("/delivery/dashboard", { replace: true });
       else navigate("/", { replace: true });
-
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -111,22 +121,17 @@ const Auth = () => {
         {/* Step 1: Choose Role */}
         {step === "role" && (
           <>
-            <h1 className="text-3xl font-semibold text-center mb-2">
-              Welcome!
-            </h1>
+            <h1 className="text-3xl font-semibold text-center mb-2">Welcome!</h1>
             <p className="text-center text-gray-500 mb-8">
               Choose how you want to continue
             </p>
 
-            {/* options */}
+            {/* Role options */}
             <div className="space-y-4">
               {[
                 { role: "user", icon: <User />, label: "User" },
-                {
-                  role: "restaurant",
-                  icon: <Store />,
-                  label: "Restaurant Owner",
-                },
+                { role: "restaurant", icon: <Store />, label: "Restaurant Owner" },
+                { role: "delivery", icon: <Truck />, label: "Delivery Partner" },
                 { role: "admin", icon: <Shield />, label: "Admin" },
               ].map(({ role, icon, label }) => (
                 <button
@@ -140,14 +145,10 @@ const Auth = () => {
                   hover:border-amber-500 hover:bg-amber-50 transition hover:cursor-pointer active:scale-95"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <span className="group-hover:text-amber-500 transition">
-                      {icon}
-                    </span>
+                    <span className="group-hover:text-amber-500 transition">{icon}</span>
                     <span className="font-medium">{label}</span>
                   </div>
-                  <span className="text-gray-400 group-hover:text-amber-500">
-                    →
-                  </span>
+                  <span className="text-gray-400 group-hover:text-amber-500">→</span>
                 </button>
               ))}
             </div>
@@ -167,9 +168,7 @@ const Auth = () => {
             </button>
 
             {/* Error Messages */}
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            )}
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
             {/* heading */}
             <h2 className="text-2xl font-semibold text-center">
@@ -179,7 +178,7 @@ const Auth = () => {
             {/* Signup-only fields */}
             {isSignup && formData.role !== "admin" && (
               <>
-                {formData.role === "user" && (
+                {(formData.role === "user" || formData.role === "delivery") && (
                   <>
                     <label className="text-sm font-medium">
                       Name <span className="text-amber-600">*</span>
@@ -190,9 +189,8 @@ const Auth = () => {
                       value={formData.name}
                       onChange={handleChange}
                       className="w-full mt-1 px-4 py-2 border rounded-lg"
-                      placeholder="enter your name"
+                      placeholder="Enter your name"
                     />
-
                     <label className="text-sm font-medium">
                       Phone <span className="text-amber-600">*</span>
                     </label>
@@ -202,32 +200,32 @@ const Auth = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full mt-1 px-4 py-2 border rounded-lg"
-                      placeholder="enter your phone number"
+                      placeholder="Enter your phone number"
                     />
-
-                    <label className="text-sm font-medium">
-                      Gender <span className="text-amber-600">*</span>
-                    </label>
-
-                    <div className="relative">
-                      <select
-                        name="gender"
-                        required
-                        value={formData.gender}
-                        onChange={handleChange}
-                        className="w-full mt-1 px-4 pr-12 py-2 border rounded-lg appearance-none"
-                      >
-                        <option value="">-- Select Gender --</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                      </select>
-
-                      {/* Lucide arrow */}
-                      <ChevronDown
-                        size={20}
-                        className="pointer-events-none absolute right-4 top-7 -translate-y-1/2"
-                      />
-                    </div>
+                    {formData.role === "user" && (
+                      <>
+                        <label className="text-sm font-medium">
+                          Gender <span className="text-amber-600">*</span>
+                        </label>
+                        <div className="relative">
+                          <select
+                            name="gender"
+                            required
+                            value={formData.gender}
+                            onChange={handleChange}
+                            className="w-full mt-1 px-4 pr-12 py-2 border rounded-lg appearance-none"
+                          >
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                          </select>
+                          <ChevronDown
+                            size={20}
+                            className="pointer-events-none absolute right-4 top-7 -translate-y-1/2"
+                          />
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
 
@@ -276,13 +274,9 @@ const Auth = () => {
                     <label className="text-sm font-medium">
                       Categories <span className="text-amber-600">*</span>
                     </label>
-
                     <div className="flex flex-wrap gap-3 pt-2">
                       {CATEGORY_OPTIONS.map((category) => {
-                        const selected = formData.categories.includes(
-                          category.value
-                        );
-
+                        const selected = formData.categories.includes(category.value);
                         return (
                           <button
                             type="button"
@@ -291,25 +285,22 @@ const Auth = () => {
                               setFormData((prev) => ({
                                 ...prev,
                                 categories: selected
-                                  ? prev.categories.filter(
-                                      (c) => c !== category.value
-                                    )
+                                  ? prev.categories.filter((c) => c !== category.value)
                                   : [...prev.categories, category.value],
                               }));
                             }}
                             className={`px-4 py-2 rounded-full border text-sm font-medium transition hover:cursor-pointer
-          ${
-            selected
-              ? "bg-amber-500 text-white border-amber-500 active:scale-95"
-              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:scale-95"
-          }`}
+              ${
+                selected
+                  ? "bg-amber-500 text-white border-amber-500 active:scale-95"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:scale-95"
+              }`}
                           >
                             {category.label}
                           </button>
                         );
                       })}
                     </div>
-
                     {formData.categories.length === 0 && (
                       <p className="text-xs text-gray-500 mt-2">
                         Select at least one category
@@ -346,9 +337,8 @@ const Auth = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg pr-10"
-                placeholder="enter your password"
+                placeholder="Enter your password"
               />
-
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

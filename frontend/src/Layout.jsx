@@ -10,7 +10,10 @@ const Layout = ({ children }) => {
     "/messages",
     "/orderHistory",
     "/settings",
-    "/about"
+    "/about",
+    "/faqs",
+    "/contact",
+    "/help",
   ];
 
   const showNavbar = !hideNavbarPaths.includes(location.pathname);

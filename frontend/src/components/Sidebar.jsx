@@ -3,23 +3,26 @@ import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Heart,
-  MessageSquare,
   History,
   Settings,
   Shield,
   User,
-  CheckCircle,
-  AlertTriangle,
-  BarChart,
+  Info,
+  HelpCircle,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const LeftSidebar = () => {
+const Sidebar = () => {
   const { role } = useAuth();
 
   // Public nav
   const publicNav = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Home", path: "/", icon: LayoutDashboard },
+    { name: "Today's Deals", path: "/deals/today", icon: Heart },
+    { name: "About Us", path: "/about", icon: Info },
+    { name: "FAQs", path: "/faqs", icon: HelpCircle },
+    { name: "Contact Us", path: "/contact", icon: MessageSquare },
   ];
 
   // User nav
@@ -34,18 +37,42 @@ const LeftSidebar = () => {
   // Restaurant nav
   const restaurantNav = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    { name: "Restaurant Dashboard", path: "/restaurant/dashboard", icon: LayoutDashboard },
+    {
+      name: "Restaurant Dashboard",
+      path: "/restaurant/dashboard",
+      icon: LayoutDashboard,
+    },
     { name: "Orders", path: "/restaurant/orders", icon: History },
     { name: "Menu", path: "/restaurant/menu", icon: Shield },
+    {
+      name: "Delivery Partners",
+      path: "/restaurant/delivery-partners",
+      icon: Shield,
+    },
   ];
 
   // Admin nav
   const adminNav = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    { name: "Admin Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+    {
+      name: "Admin Dashboard",
+      path: "/admin/dashboard",
+      icon: LayoutDashboard,
+    },
     { name: "Users", path: "/admin/users", icon: User },
     { name: "Restaurants", path: "/admin/restaurants", icon: Shield },
-    { name: "Delivery Partners", path: "/admin/deliveryPartners", icon: Shield },
+    {
+      name: "Delivery Partners",
+      path: "/admin/deliveryPartners",
+      icon: Shield,
+    },
+    { name: "Settings", path: "/settings", icon: Settings },
+  ];
+
+  // Delivery Partner nav
+  const deliveryNav = [
+    { name: "Dashboard", path: "/delivery/dashboard", icon: LayoutDashboard },
+    { name: "My Orders", path: "/delivery/orders", icon: History },
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
@@ -54,18 +81,17 @@ const LeftSidebar = () => {
   if (role === "user") navItems = userNav;
   if (role === "restaurant") navItems = restaurantNav;
   if (role === "admin") navItems = adminNav;
+  if (role === "delivery") navItems = deliveryNav; // delivery partner
 
   return (
     <div className="w-56 h-screen bg-white flex flex-col justify-between p-4 shadow-xl">
       <div>
-        {/* Logo */}
         <div className="mb-10 p-2">
           <Link to="/" className="text-2xl font-bold text-gray-800">
             BiteBox<span className="text-amber-500">.</span>
           </Link>
         </div>
 
-        {/* Navigation */}
         <nav>
           <ul>
             {navItems.map((item) => (
@@ -82,8 +108,15 @@ const LeftSidebar = () => {
           </ul>
         </nav>
       </div>
+      <Link
+        to="/help"
+        className="mt-auto flex items-center gap-2 p-3 rounded-lg text-sm text-gray-600 hover:text-amber-500 hover:underline transition"
+      >
+        <HelpCircle className="w-5 h-5" />
+        <span>Need Help?</span>
+      </Link>
     </div>
   );
 };
 
-export default LeftSidebar;
+export default Sidebar;

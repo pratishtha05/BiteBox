@@ -82,13 +82,104 @@ router.put("/:orderId/status", auth, async (req, res) => {
 
   const { status } = req.body;
 
-  const order = await Order.findOneAndUpdate(
-    { _id: req.params.orderId, restaurant: req.auth.id },
-    { status },
-    { new: true }
-  );
+  const VALID_FLOW = ["pending", "accepted", "preparing", "completed"];
+
+  const order = await Order.findOne({
+    _id: req.params.orderId,
+    restaurant: req.auth.id,
+  });
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  // Lock completed / cancelled orders
+  if (["completed", "cancelled"].includes(order.status)) {
+    return res
+      .status(400)
+      .json({ message: "Order status can no longer be updated" });
+  }
+
+  // Cancel allowed anytime before completion
+  if (status === "cancelled") {
+    order.status = "cancelled";
+    await order.save();
+    return res.json(order);
+  }
+
+  const currentIndex = VALID_FLOW.indexOf(order.status);
+  const nextValidStatus = VALID_FLOW[currentIndex + 1];
+
+  if (status !== nextValidStatus) {
+    return res.status(400).json({
+      message: `Invalid status transition from ${order.status} to ${status}`,
+    });
+  }
+
+  order.status = status;
+  await order.save();
 
   res.json(order);
 });
+
+
+router.put("/:orderId/assign-delivery", auth, async (req, res) => {
+  if (req.auth.role !== "restaurant") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  const { deliveryPartnerId } = req.body;
+
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.orderId, restaurant: req.auth.id },
+    {
+      deliveryPartner: deliveryPartnerId,
+      deliveryStatus: "assigned",
+    },
+    { new: true }
+  );
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  res.json(order);
+});
+
+router.get("/delivery/my-orders", auth, async (req, res) => {
+  if (req.auth.role !== "delivery") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  const orders = await Order.find({
+    deliveryPartner: req.auth.id,
+  })
+    .populate("restaurant", "name address")
+    .populate("customer", "name phone")
+    .sort({ createdAt: -1 });
+
+  res.json(orders);
+});
+
+router.put("/:orderId/delivery-status", auth, async (req, res) => {
+  if (req.auth.role !== "delivery") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  const { deliveryStatus } = req.body;
+
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.orderId, deliveryPartner: req.auth.id },
+    { deliveryStatus },
+    { new: true }
+  );
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  res.json(order);
+});
+
 
 module.exports = router;
