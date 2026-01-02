@@ -14,7 +14,7 @@ const Dashboard = () => {
   // ---------------- FETCH CATEGORIES ----------------
   useEffect(() => {
     // Static list OR fetch from backend if you have one
-    setCategories(["Indian", "Chinese", "Fast Food", "Cafe", "Bakery"]);
+    setCategories(["Indian", "Chinese", "Fast Food", "Bakery"]);
   }, []);
 
   // ---------------- FETCH RESTAURANTS ----------------

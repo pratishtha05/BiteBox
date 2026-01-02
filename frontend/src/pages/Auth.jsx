@@ -36,7 +36,8 @@ const Auth = () => {
   });
 
   const CATEGORY_OPTIONS = [
-    { label: "North Indian", value: " north indian" },
+    { label: "North Indian", value: "north indian" },
+    { label: "South Indian", value: "south indian" },
     { label: "Chinese", value: "chinese" },
     { label: "Fast Food", value: "fast food" },
     { label: "Bakery", value: "bakery" },
