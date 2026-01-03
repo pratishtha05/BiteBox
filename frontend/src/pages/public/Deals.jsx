@@ -1,53 +1,93 @@
-// Deals.jsx
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Deals = () => {
   const { dealType } = useParams();
   const [deals, setDeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const allDeals = {
-      today: [
-        { id: 1, name: "50% off on Pizza", description: "Valid today only!", image: "https://via.placeholder.com/80" },
-        { id: 2, name: "Free Drink with Burger", description: "Get a free drink with any burger.", image: "https://via.placeholder.com/80" },
-      ],
-      weekend: [
-        { id: 3, name: "Buy 1 Get 1 Sandwich", description: "Only this weekend!", image: "https://via.placeholder.com/80" },
-        { id: 4, name: "20% off Desserts", description: "Sweet treats at a discount.", image: "https://via.placeholder.com/80" },
-      ],
-      festival: [
-        { id: 5, name: "Special Diwali Combo", description: "Celebrate with this combo!", image: "https://via.placeholder.com/80" },
-      ],
+    const fetchDeals = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch(
+          `http://localhost:3000/public/deals/${dealType}`
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to load deals");
+        }
+
+        const data = await res.json();
+        setDeals(data);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to fetch deals. Please try again.");
+        setDeals([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    setDeals(allDeals[dealType] || []);
+
+    if (dealType) fetchDeals();
   }, [dealType]);
 
   return (
-    <div className="p-6">
-      {/* Page Title */}
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Title */}
       <h1 className="text-3xl font-bold mb-6 capitalize text-gray-800">
         {dealType} Deals
       </h1>
 
-      {deals.length === 0 ? (
-        <p className="text-gray-500">No deals found!</p>
-      ) : (
+      {/* Loading */}
+      {loading && <p className="text-gray-500">Loading deals...</p>}
+
+      {/* Error */}
+      {!loading && error && (
+        <p className="text-red-500 font-medium">{error}</p>
+      )}
+
+      {/* Empty */}
+      {!loading && !error && deals.length === 0 && (
+        <p className="text-gray-500">No deals available right now</p>
+      )}
+
+      {/* Deals */}
+      {!loading && deals.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {deals.map((deal) => (
             <div
-              key={deal.id}
-              className="bg-white shadow-lg rounded-xl overflow-hidden hover:scale-105 transition-transform duration-200"
+              key={deal._id}
+              className="bg-white shadow-lg rounded-xl overflow-hidden
+                         hover:scale-[1.02] transition-transform duration-200"
             >
               <img
-                src={deal.image}
-                alt={deal.name}
+                src={deal.image || "/placeholder-deal.jpg"}
+                alt={deal.title}
                 className="w-full h-40 object-cover"
               />
+
               <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800">{deal.name}</h2>
-                <p className="text-gray-500 mt-1 text-sm">{deal.description}</p>
-                <button className="mt-4 w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition">
+                <span className="inline-block mb-2 text-xs px-3 py-1 rounded-full
+                                 bg-amber-100 text-amber-600 font-semibold">
+                  {deal.dealType}
+                </span>
+
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {deal.title}
+                </h2>
+
+                <p className="text-gray-500 mt-1 text-sm">
+                  {deal.description}
+                </p>
+
+                <button
+                  className="mt-4 w-full bg-amber-500 text-white py-2
+                             rounded-lg hover:bg-amber-600 transition"
+                >
                   Grab Deal
                 </button>
               </div>

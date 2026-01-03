@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Utensils } from "lucide-react";
+import { Utensils, Pizza, CakeSlice, Soup } from "lucide-react";
 
 const Dashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -14,7 +14,7 @@ const Dashboard = () => {
   // ---------------- FETCH CATEGORIES ----------------
   useEffect(() => {
     // Static list OR fetch from backend if you have one
-    setCategories(["Indian", "Chinese", "Fast Food", "Bakery"]);
+    setCategories(["North Indian", "South Indian", "Fast Food", "Bakery"]);
   }, []);
 
   // ---------------- FETCH RESTAURANTS ----------------
@@ -28,7 +28,10 @@ const Dashboard = () => {
           : `http://localhost:3000/public/restaurants`;
 
         const res = await axios.get(url);
-        setRestaurants(res.data.restaurants);
+        const shuffled = [...res.data.restaurants].sort(
+          () => Math.random() - 0.5
+        );
+        setRestaurants(shuffled);
       } catch (err) {
         console.error(err);
       } finally {
@@ -39,12 +42,35 @@ const Dashboard = () => {
     fetchRestaurants();
   }, [selectedCategory]);
 
+  const getCategoryIcon = (categories = []) => {
+    const primary = categories[0]?.toLowerCase();
+
+    if (!primary) return <Utensils size={36} />;
+
+    if (primary.includes("north indian")) return <Soup size={36} />;
+    if (primary.includes("south indian")) return <Soup size={36} />;
+    if (primary.includes("fast food")) return <Pizza size={36} />;
+    if (primary.includes("bakery")) return <CakeSlice size={36} />;
+
+    return <Utensils size={36} />;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      
       {/* ---------------- CATEGORIES ---------------- */}
       <div className="mb-10">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Categories</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
+
+          {selectedCategory && (
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="text-sm font-medium text-amber-600 hover:underline hover:cursor-pointer"
+            >
+              Clear filter
+            </button>
+          )}
+        </div>
 
         <div className="flex justify-between gap-4 overflow-x-auto pb-2">
           {categories.map((category) => (
@@ -68,15 +94,6 @@ const Dashboard = () => {
             </button>
           ))}
         </div>
-
-        {selectedCategory && (
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className="mt-3 text-sm text-amber-600 hover:underline hover:cursor-pointer"
-          >
-            Clear filter
-          </button>
-        )}
       </div>
 
       {/* ---------------- RESTAURANTS ---------------- */}
@@ -94,11 +111,11 @@ const Dashboard = () => {
              transition-transform hover:scale-[1.01] hover:shadow-lg"
             >
               {/* Restaurant Image */}
-              <img
-                src={restaurant.image || "/placeholder-restaurant.jpg"}
-                alt={restaurant.name}
-                className="w-full h-40 object-cover"
-              />
+              <div className="h-40 flex items-center justify-center bg-amber-50">
+                <div className="w-20 h-20 rounded-2xl bg-white shadow flex items-center justify-center text-amber-500">
+                  {getCategoryIcon(restaurant.categories)}
+                </div>
+              </div>
 
               {/* Category Badge */}
               {restaurant.categories?.[0] && (

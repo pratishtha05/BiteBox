@@ -8,6 +8,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import Users from "../pages/admin/Users";
 import Restaurants from "../pages/admin/Restaurants";
 import DeliveryPartners from "../pages/admin/DeliveryPartners";
+import Deals from "../pages/admin/Deals";
 
 const AdminRoutes = () => {
   return (
@@ -44,6 +45,14 @@ const AdminRoutes = () => {
           element={
             <Layout>
               <DeliveryPartners />
+            </Layout>
+          }
+        />
+        <Route
+          path="deals"
+          element={
+            <Layout>
+              <Deals />
             </Layout>
           }
         />

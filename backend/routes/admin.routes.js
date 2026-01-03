@@ -6,6 +6,7 @@ const Admin = require("../models/admin.model");
 const User = require("../models/user.model");
 const Order = require("../models/order.model"); // Order model
 const Restaurant = require("../models/restaurant.model");
+const Deal = require("../models/deal.model");
 
 
 const router = express.Router();
@@ -199,5 +200,47 @@ router.get("/dashboard", auth, async (req, res) => {
   }
 });
 
+/* ---------------- CREATE DEAL ---------------- */
+router.post("/deals", auth, async (req, res) => {
+  if (req.auth.role !== "admin")
+    return res.status(403).json({ message: "Forbidden" });
+
+  const deal = await Deal.create(req.body);
+  res.status(201).json(deal);
+});
+
+/* ---------------- GET ALL DEALS ---------------- */
+router.get("/deals", auth, async (req, res) => {
+  if (req.auth.role !== "admin")
+    return res.status(403).json({ message: "Forbidden" });
+
+  const deals = await Deal.find().sort({ createdAt: -1 });
+  res.json(deals);
+});
+
+/* ---------------- UPDATE DEAL ---------------- */
+router.put("/deals/:id", auth, async (req, res) => {
+  if (req.auth.role !== "admin")
+    return res.status(403).json({ message: "Forbidden" });
+
+  const deal = await Deal.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
+  if (!deal) return res.status(404).json({ message: "Deal not found" });
+
+  res.json(deal);
+});
+
+/* ---------------- DELETE DEAL ---------------- */
+router.delete("/deals/:id", auth, async (req, res) => {
+  if (req.auth.role !== "admin")
+    return res.status(403).json({ message: "Forbidden" });
+
+  await Deal.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deal deleted successfully" });
+});
+
+module.exports = router;
 
 module.exports = router;
