@@ -72,15 +72,17 @@ router.delete("/delete", auth, async (req, res) => {
   if (req.auth.role !== "restaurant")
     return res.status(403).json({ message: "Forbidden" });
 
-  await Restaurant.findByIdAndDelete(req.auth.id);
+  const restaurant = await Restaurant.findById(req.auth.id);
 
-  if (restaurant.isBlocked) {
-    return res
-      .status(403)
-      .json({ message: `Account blocked: ${restaurant.blockReason}` });
-  }
+if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
 
-  res.json({ message: "Restaurant account deleted" });
+if (restaurant.isBlocked) {
+  return res.status(403).json({ message: `Account blocked: ${restaurant.blockReason}` });
+}
+
+await Restaurant.findByIdAndDelete(req.auth.id);
+res.json({ message: "Restaurant account deleted" });
+
 });
 
 // GET /restaurant/dashboard

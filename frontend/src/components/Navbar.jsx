@@ -24,7 +24,8 @@ const Navbar = () => {
   // Display name based on role
   let displayName = "Guest";
   if (role === "user" && user?.name) displayName = user.name;
-  else if (role === "restaurant" && restaurant?.name) displayName = restaurant.name;
+  else if (role === "restaurant" && restaurant?.name)
+    displayName = restaurant.name;
   else if (role === "admin" && admin?.name) displayName = admin.name;
   else if (role === "delivery" && delivery?.name) displayName = delivery.name; // delivery partner
 
@@ -71,13 +72,13 @@ const Navbar = () => {
               </button>
 
               <button
-                className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
+                className="relative flex items-center justify-center w-10 h-10  rounded-full text-gray-600 hover:text-amber-500 transition cursor-pointer active:scale-95"
                 title="Cart"
                 onClick={() => setCartOpen(true)}
               >
-                <ShoppingCart size={24} />
+                <ShoppingCart size={22} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-sm">
                     {cartCount}
                   </span>
                 )}

@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Deals = () => {
-  const { dealType } = useParams();
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,9 +12,7 @@ const Deals = () => {
         setLoading(true);
         setError("");
 
-        const res = await fetch(
-          `http://localhost:3000/public/deals/${dealType}`
-        );
+        const res = await fetch(`http://localhost:3000/public/deals`);
 
         if (!res.ok) {
           throw new Error("Failed to load deals");
@@ -32,23 +29,21 @@ const Deals = () => {
       }
     };
 
-    if (dealType) fetchDeals();
-  }, [dealType]);
+    fetchDeals(); // ✅ CALL FUNCTION
+  }, []);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Title */}
-      <h1 className="text-3xl font-bold mb-6 capitalize text-gray-800">
-        {dealType} Deals
-      </h1>
+      <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">
+        Explore Deals
+      </h2>
 
       {/* Loading */}
       {loading && <p className="text-gray-500">Loading deals...</p>}
 
       {/* Error */}
-      {!loading && error && (
-        <p className="text-red-500 font-medium">{error}</p>
-      )}
+      {!loading && error && <p className="text-red-500 font-medium">{error}</p>}
 
       {/* Empty */}
       {!loading && !error && deals.length === 0 && (
@@ -71,18 +66,11 @@ const Deals = () => {
               />
 
               <div className="p-4">
-                <span className="inline-block mb-2 text-xs px-3 py-1 rounded-full
-                                 bg-amber-100 text-amber-600 font-semibold">
-                  {deal.dealType}
-                </span>
-
                 <h2 className="text-lg font-semibold text-gray-800">
                   {deal.title}
                 </h2>
 
-                <p className="text-gray-500 mt-1 text-sm">
-                  {deal.description}
-                </p>
+                <p className="text-gray-500 mt-1 text-sm">{deal.description}</p>
 
                 <button
                   className="mt-4 w-full bg-amber-500 text-white py-2

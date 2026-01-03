@@ -13,13 +13,6 @@ const dealSchema = new mongoose.Schema(
       trim: true,
     },
 
-    dealType: {
-      type: String,
-      required: true, // today | weekend | festival | custom
-      lowercase: true,
-      index: true,
-    },
-
     image: {
       type: String,
       default: "",
@@ -28,10 +21,12 @@ const dealSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
 
     validTill: {
       type: Date,
+      index: true,
     },
   },
   { timestamps: true }

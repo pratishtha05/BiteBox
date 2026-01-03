@@ -35,20 +35,24 @@ const Contact = () => {
   }, [status.visible]);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto relative">
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">Contact Us</h1>
-      <p className="text-gray-700 mb-6">
+    <div className="p-6 mt-10 max-w-4xl mx-auto bg-gray-50 rounded-xl ">
+      {/* Page Heading */}
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
+        Get in Touch
+      </h1>
+      <p className="text-gray-700 mb-8 text-center">
         Questions, feedback, or suggestions? Fill out the form below and our team will respond promptly.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Contact Form */}
+      <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
           name="name"
           value={form.name}
           onChange={handleChange}
           placeholder="Full Name"
-          className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm transition"
           required
         />
         <input
@@ -57,7 +61,7 @@ const Contact = () => {
           value={form.email}
           onChange={handleChange}
           placeholder="Email Address"
-          className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm transition"
           required
         />
         <textarea
@@ -65,13 +69,13 @@ const Contact = () => {
           value={form.message}
           onChange={handleChange}
           placeholder="Your Message"
-          className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none h-40"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm transition h-40 resize-none"
           required
         />
         <button
           type="submit"
           disabled={status.loading}
-          className="w-full bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
+          className="w-full bg-amber-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-amber-600 transition shadow-md hover:cursor-pointer active:scale-95"
         >
           {status.loading ? "Sending..." : "Send Message"}
         </button>
@@ -80,7 +84,7 @@ const Contact = () => {
       {/* Notification */}
       {status.visible && (
         <div
-          className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 z-50 ${
             status.error ? "bg-red-500" : "bg-green-500"
           }`}
         >

@@ -210,13 +210,21 @@ router.post("/deals", auth, async (req, res) => {
 });
 
 /* ---------------- GET ALL DEALS ---------------- */
-router.get("/deals", auth, async (req, res) => {
+router.get("/admin/deals", auth, async (req, res) => {
   if (req.auth.role !== "admin")
     return res.status(403).json({ message: "Forbidden" });
+
+  const now = new Date();
+
+  await Deal.updateMany(
+    { isActive: true, validTill: { $lt: now } },
+    { $set: { isActive: false } }
+  );
 
   const deals = await Deal.find().sort({ createdAt: -1 });
   res.json(deals);
 });
+
 
 /* ---------------- UPDATE DEAL ---------------- */
 router.put("/deals/:id", auth, async (req, res) => {

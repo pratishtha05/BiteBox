@@ -16,7 +16,6 @@ const Deals = () => {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    dealType: "today",
     image: "",
     validTill: "",
   });
@@ -104,11 +103,11 @@ const Deals = () => {
     }
   };
 
-  if (loading) return <p className="text-center py-10 text-gray-500">Loading deals...</p>;
+  if (loading)
+    return <p className="text-center py-10 text-gray-500">Loading deals...</p>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-
       {/* ---------------- MESSAGE ---------------- */}
       {message.text && (
         <p
@@ -140,16 +139,6 @@ const Deals = () => {
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
-        <select
-          className="border p-3 rounded"
-          value={form.dealType}
-          onChange={(e) => setForm({ ...form, dealType: e.target.value })}
-        >
-          <option value="today">Today</option>
-          <option value="weekend">Weekend</option>
-          <option value="festival">Festival</option>
-          <option value="custom">Custom</option>
-        </select>
         <input
           type="date"
           className="border p-3 rounded"
@@ -176,18 +165,15 @@ const Deals = () => {
               >
                 <div className="space-y-1">
                   <h3 className="font-semibold">{deal.title}</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700">
-                    {deal.dealType}
-                  </span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <span
                     className={`text-sm font-semibold ${
-                      deal.isActive ? "text-green-600" : "text-red-600"
+                      !deal.isActive ? "text-red-600" : "text-green-600"
                     }`}
                   >
-                    {deal.isActive ? "Active" : "Inactive"}
+                    {!deal.isActive ? "Expired" : "Active"}
                   </span>
 
                   <ChevronDown
@@ -200,8 +186,15 @@ const Deals = () => {
 
               {expanded && (
                 <div className="p-4 bg-gray-50 border-t rounded-b-xl space-y-3">
-                  <p><strong>Description:</strong> {deal.description || "-"}</p>
-                  <p><strong>Valid Till:</strong> {deal.validTill ? new Date(deal.validTill).toDateString() : "-"}</p>
+                  <p>
+                    <strong>Description:</strong> {deal.description || "-"}
+                  </p>
+                  <p>
+                    <strong>Valid Till:</strong>{" "}
+                    {deal.validTill
+                      ? new Date(deal.validTill).toDateString()
+                      : "-"}
+                  </p>
 
                   <div className="flex gap-3 pt-2">
                     <button
@@ -259,18 +252,6 @@ const Deals = () => {
                 setEditDeal({ ...editDeal, description: e.target.value })
               }
             />
-            <select
-              className="border p-3 rounded w-full"
-              value={editDeal.dealType}
-              onChange={(e) =>
-                setEditDeal({ ...editDeal, dealType: e.target.value })
-              }
-            >
-              <option value="today">Today</option>
-              <option value="weekend">Weekend</option>
-              <option value="festival">Festival</option>
-              <option value="custom">Custom</option>
-            </select>
 
             <input
               type="date"

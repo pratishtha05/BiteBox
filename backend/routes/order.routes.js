@@ -23,6 +23,7 @@ router.post("/create", auth, async (req, res) => {
       restaurant: restaurantId,
       items,
       totalAmount,
+      status: "placed"
     });
 
     res.status(201).json(order);
@@ -32,9 +33,7 @@ router.post("/create", auth, async (req, res) => {
 });
 
 /**
- * =========================
  * USER ORDERS
- * =========================
  */
 router.get("/my-orders", auth, async (req, res) => {
   try {
@@ -53,22 +52,58 @@ router.get("/my-orders", auth, async (req, res) => {
 });
 
 
+
+
+
 /**
  * =========================
  * RESTAURANT ORDERS
  * =========================
  */
 router.get("/restaurant", auth, async (req, res) => {
-  if (req.auth.role !== "restaurant") {
-    return res.status(403).json({ message: "Forbidden" });
+  try {
+    if (req.auth.role !== "restaurant") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const orders = await Order.find({ restaurant: req.auth.id })
+      .populate("customer", "name")
+      .populate("deliveryPartner", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
-
-  const orders = await Order.find({ restaurant: req.auth.id })
-    .populate("customer", "name")
-    .sort({ createdAt: -1 });
-
-  res.json(orders);
 });
+
+/**
+ * GET SINGLE ORDER (USED BY CONFIRMATION / TRACK)
+ */
+router.get("/:orderId", auth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.orderId)
+      .populate("restaurant", "name address");
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // User can only see their own orders
+    if (
+      req.auth.role === "user" &&
+      order.customer.toString() !== req.auth.id
+    ) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 /**
  * =========================
@@ -82,7 +117,7 @@ router.put("/:orderId/status", auth, async (req, res) => {
 
   const { status } = req.body;
 
-  const VALID_FLOW = ["pending", "accepted", "preparing", "completed"];
+  const VALID_FLOW = ["placed", "accepted", "preparing","out for delivery", "completed"];
 
   const order = await Order.findOne({
     _id: req.params.orderId,

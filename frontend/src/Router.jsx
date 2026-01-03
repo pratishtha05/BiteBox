@@ -2,20 +2,17 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Layout from "./Layout";
 
-import Home from "./pages/public/Home.jsx";
-import Auth from "./pages/Auth.jsx";
-import RestaurantMenu from "./pages/RestaurantMenu.jsx";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import Cart from "./components/Cart";
 
 import AdminRoutes from "./routes/AdminRoutes.jsx";
 import RestaurantRoutes from "./routes/RestaurantRoutes.jsx";
-import Settings from "./pages/Settings.jsx";
-import SearchResults from "./pages/SearchResults.jsx";
 import Orders from "./pages/Orders.jsx";
 import DeliveryRoutes from "./routes/DeliveryRoutes.jsx";
-import Deals from "./pages/public/Deals.jsx";
 import PublicRoutes from "./routes/PublicRoutes.jsx";
+import Settings from "./pages/Settings.jsx";
+import Confirmation from "./pages/Confirmation.jsx";
+import TrackOrder from "./pages/TrackOrder.jsx";
 
 const Router = () => {
   return (
@@ -34,6 +31,37 @@ const Router = () => {
             element={
               <Layout>
                 <Orders />
+              </Layout>
+            }
+          />
+          <Route
+            path="/confirmation/:orderId"
+            element={
+              <Layout>
+                <Confirmation />
+              </Layout>
+            }
+          />
+          <Route
+            path="/track-order/:orderId"
+            element={
+              <Layout>
+                <TrackOrder />
+              </Layout>
+            }
+          />
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoutes allowedRoles={["user", "admin", "restaurant"]} />
+          }
+        >
+          <Route
+            path="/settings"
+            element={
+              <Layout>
+                <Settings />
               </Layout>
             }
           />

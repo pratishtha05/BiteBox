@@ -10,7 +10,7 @@ router.get("/me", auth, async (req, res) => {
   if (req.auth.role !== "user")
     return res.status(403).json({ message: "Forbidden" });
 
-  const user = await User.findById(req.auth.id).select("-password isBlocked blockReason");
+  const user = await User.findById(req.auth.id).select("-password");
   res.json(user);
 });
 

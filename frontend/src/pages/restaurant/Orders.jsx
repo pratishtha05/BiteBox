@@ -4,6 +4,15 @@ import { useAuth } from "../../context/AuthContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const STATUS_COLORS = {
+  placed: "bg-gray-100 text-gray-800",
+  accepted: "bg-blue-100 text-blue-800",
+  preparing: "bg-yellow-100 text-yellow-800",
+  "out for delivery": "bg-purple-100 text-purple-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
 const Orders = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -13,8 +22,7 @@ const Orders = () => {
   const [openDates, setOpenDates] = useState({});
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  /* ---------------- HELPERS ---------------- */
+  const [updating, setUpdating] = useState(null);
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-IN", {
@@ -23,8 +31,8 @@ const Orders = () => {
       year: "numeric",
     });
 
-  const isToday = (date) =>
-    new Date(date).toDateString() === new Date().toDateString();
+  const isToday = (formattedDate) =>
+    formattedDate === formatDate(new Date());
 
   const getLast7Days = () => {
     const days = [];
@@ -36,13 +44,19 @@ const Orders = () => {
     return days;
   };
 
-  const getNextStatus = (status) => {
-    const flow = ["pending", "accepted", "preparing", "completed"];
-    const index = flow.indexOf(status);
-    return index >= 0 && index < flow.length - 1 ? flow[index + 1] : null;
-  };
+  const STATUS_FLOW = [
+    "placed",
+    "accepted",
+    "preparing",
+    "out for delivery",
+    "completed",
+  ];
 
-  /* ---------------- FETCH DATA ---------------- */
+  const getNextStatus = (status) => {
+    const index = STATUS_FLOW.indexOf(status);
+    if (index === -1 || index === STATUS_FLOW.length - 1) return null;
+    return STATUS_FLOW[index + 1];
+  };
 
   const fetchOrders = async () => {
     try {
@@ -67,11 +81,10 @@ const Orders = () => {
   };
 
   useEffect(() => {
+    if (!token) return;
     fetchOrders();
     fetchPartners();
-  }, []);
-
-  /* ---------------- GROUPING ---------------- */
+  }, [token]);
 
   const groupedOrders = orders.reduce((acc, order) => {
     const key = formatDate(order.createdAt);
@@ -92,8 +105,6 @@ const Orders = () => {
     setOpenDates(state);
   }, [showAll, orders]);
 
-  /* ---------------- ACTIONS ---------------- */
-
   const assignPartner = async (orderId, partnerId) => {
     if (!partnerId) return;
     await axios.put(
@@ -105,19 +116,21 @@ const Orders = () => {
   };
 
   const updateStatus = async (orderId, status) => {
-    await axios.put(
-      `http://localhost:3000/order/${orderId}/status`,
-      { status },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchOrders();
+    try {
+      setUpdating(orderId);
+      await axios.put(
+        `http://localhost:3000/order/${orderId}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchOrders();
+    } finally {
+      setUpdating(null);
+    }
   };
 
-  if (loading) {
+  if (loading)
     return <p className="text-center text-gray-500 mt-10">Loading orders...</p>;
-  }
-
-  /* ---------------- UI ---------------- */
 
   return (
     <div className="p-6 space-y-6">
@@ -125,30 +138,29 @@ const Orders = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
         <button
-          // onClick={() => setShowAll(!showAll)}
+          onClick={() => setShowAll(!showAll)}
           className="text-sm font-medium text-amber-600 hover:underline"
         >
-          {/* {showAll ? "View Last 7 Days" : "View All Orders"} */}View all Orders
+          {showAll ? "View Last 7 Days" : "View All Orders"}
         </button>
       </div>
 
       {/* Date Sections */}
       {visibleDates.map((date) => {
         const dayOrders = groupedOrders[date] || [];
-
         return (
-          <div key={date} className="bg-white rounded-xl shadow">
+          <div key={date} className="bg-white rounded-xl shadow-md overflow-hidden">
             {/* Date Header */}
             <button
               onClick={() =>
                 setOpenDates((p) => ({ ...p, [date]: !p[date] }))
               }
-              className="w-full px-6 py-4 flex justify-between items-center border-b"
+              className="w-full px-6 py-4 flex justify-between items-center border-b hover:bg-gray-50 transition"
             >
               <div>
                 <p className="font-semibold text-gray-800">{date}</p>
                 <p className="text-sm text-gray-500">
-                  {dayOrders.length} orders
+                  {dayOrders.length} order{dayOrders.length > 1 ? "s" : ""}
                 </p>
               </div>
               {openDates[date] ? <ChevronUp /> : <ChevronDown />}
@@ -156,7 +168,7 @@ const Orders = () => {
 
             {/* Orders */}
             {openDates[date] && (
-              <div className="p-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <div className="p-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3 transition-all duration-300">
                 {dayOrders.length === 0 && (
                   <p className="text-gray-500 text-sm">
                     No orders for this day
@@ -166,13 +178,18 @@ const Orders = () => {
                 {dayOrders.map((order) => (
                   <div
                     key={order._id}
-                    className="border rounded-2xl p-5 space-y-4 hover:shadow-md transition"
+                    className="border rounded-2xl p-5 space-y-4 hover:shadow-xl transition duration-300"
                   >
-                    <div className="flex justify-between">
-                      <h3 className="font-semibold">
+                    {/* Header */}
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-gray-800">
                         Order #{order._id.slice(-6)}
                       </h3>
-                      <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          STATUS_COLORS[order.status]
+                        }`}
+                      >
                         {order.status}
                       </span>
                     </div>
@@ -220,10 +237,11 @@ const Orders = () => {
                     {/* Status */}
                     {getNextStatus(order.status) && (
                       <button
+                        disabled={updating === order._id}
                         onClick={() =>
                           updateStatus(order._id, getNextStatus(order.status))
                         }
-                        className="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600"
+                        className="w-full bg-linear-to-r from-amber-500 to-amber-600 text-white py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition"
                       >
                         Mark as {getNextStatus(order.status)}
                       </button>

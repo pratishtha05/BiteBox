@@ -13,8 +13,12 @@ const Dashboard = () => {
 
   // ---------------- FETCH CATEGORIES ----------------
   useEffect(() => {
-    // Static list OR fetch from backend if you have one
-    setCategories(["North Indian", "South Indian", "Fast Food", "Bakery"]);
+    setCategories([
+      { id: "north-indian", name: "North Indian" },
+      { id: "south-indian", name: "South Indian" },
+      { id: "fast-food", name: "Fast Food" },
+      { id: "bakery", name: "Bakery" },
+    ]);
   }, []);
 
   // ---------------- FETCH RESTAURANTS ----------------
@@ -24,13 +28,18 @@ const Dashboard = () => {
         setLoading(true);
 
         const url = selectedCategory
-          ? `http://localhost:3000/public/restaurants?category=${selectedCategory}`
+          ? `http://localhost:3000/public/restaurants?category=${selectedCategory.replace(
+              "-",
+              " "
+            )}`
           : `http://localhost:3000/public/restaurants`;
 
         const res = await axios.get(url);
+
         const shuffled = [...res.data.restaurants].sort(
           () => Math.random() - 0.5
         );
+
         setRestaurants(shuffled);
       } catch (err) {
         console.error(err);
@@ -60,7 +69,7 @@ const Dashboard = () => {
       {/* ---------------- CATEGORIES ---------------- */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
+          <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">Categories</h2>
 
           {selectedCategory && (
             <button
@@ -72,27 +81,41 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="flex justify-between gap-4 overflow-x-auto pb-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`flex flex-col items-center px-4 py-3 rounded-xl min-w-25
-                border transition cursor-pointer active:scale-95
-                ${
-                  selectedCategory === category
-                    ? "border-amber-500 bg-amber-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50"
-                }`}
-            >
-              <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white shadow-sm mb-2">
-                <Utensils className="text-amber-500" />
-              </div>
-              <span className="text-sm font-medium text-gray-700">
-                {category}
-              </span>
-            </button>
-          ))}
+        <div className="flex gap-4 justify-around overflow-x-auto pb-2">
+          {categories.map((category) => {
+            const isActive = selectedCategory === category.id;
+
+            return (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex flex-col items-center px-4 py-3 rounded-xl min-w-25
+          border transition active:scale-95
+          ${
+            isActive
+              ? "border-amber-500 bg-amber-50 hover:cursor-pointer active:scale-95"
+              : "border-gray-200 bg-white hover:bg-gray-50 hover:cursor-pointer active:scale-95"
+          }`}
+              >
+                <div
+                  className={`w-14 h-14 flex items-center justify-center rounded-xl mb-2
+            ${isActive ? "bg-amber-100" : "bg-white shadow-sm"}`}
+                >
+                  <Utensils
+                    className={isActive ? "text-amber-600" : "text-amber-500"}
+                  />
+                </div>
+
+                <span
+                  className={`text-sm font-medium ${
+                    isActive ? "text-amber-700" : "text-gray-700"
+                  }`}
+                >
+                  {category.name}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

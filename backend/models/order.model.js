@@ -30,7 +30,13 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "preparing", "completed", "cancelled"],
+      enum: [
+        "placed",
+        "accepted",
+        "preparing",
+        "out for delivery",
+        "completed",
+      ],
       default: "pending",
     },
     deliveryPartner: {
@@ -43,7 +49,7 @@ const orderSchema = new mongoose.Schema(
       enum: ["unassigned", "assigned", "picked_up", "on_the_way", "delivered"],
       default: "unassigned",
     },
-  },  
+  },
   { timestamps: true }
 );
 

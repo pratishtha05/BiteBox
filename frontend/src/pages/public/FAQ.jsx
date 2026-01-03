@@ -14,20 +14,45 @@ const FAQ = () => {
   const toggle = (index) => setOpenIndex(openIndex === index ? null : index);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h1>
+    <div className="p-6 bg-gray-50">
+      {/* Page Heading */}
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-6">
+        Frequently Asked Questions
+      </h1>
 
+      {/* FAQ List */}
       <div className="space-y-4">
         {faqs.map((faq, idx) => (
-          <div key={idx} className="bg-white shadow-lg rounded-xl p-4 hover:shadow-xl transition">
+          <div
+            key={idx}
+            className={`rounded-xl overflow-hidden transition-shadow ${
+              openIndex === idx ? "shadow-xl border-amber-400 border" : "shadow-md hover:shadow-lg"
+            } bg-white`}
+          >
             <button
-              className="w-full flex justify-between items-center text-left font-semibold text-gray-900"
+              className={`w-full flex justify-between items-center px-6 py-4 text-left font-medium text-gray-900 
+                         focus:outline-none transition-colors ${
+                           openIndex === idx ? "bg-amber-50" : "bg-white hover:bg-amber-50"
+                         }`}
               onClick={() => toggle(idx)}
             >
-              {faq.question}
-              {openIndex === idx ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              <span className={`${openIndex === idx ? "text-amber-700" : "text-gray-900"}`}>
+                {faq.question}
+              </span>
+              {openIndex === idx ? (
+                <ChevronUp className="w-5 h-5 text-amber-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
             </button>
-            {openIndex === idx && <p className="mt-2 text-gray-700">{faq.answer}</p>}
+
+            <div
+              className={`px-6 overflow-hidden transition-all duration-300 ${
+                openIndex === idx ? "max-h-40 py-2" : "max-h-0"
+              }`}
+            >
+              <p className="text-gray-700">{faq.answer}</p>
+            </div>
           </div>
         ))}
       </div>

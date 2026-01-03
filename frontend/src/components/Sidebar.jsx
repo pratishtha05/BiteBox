@@ -19,7 +19,7 @@ const Sidebar = () => {
   // Public nav
   const publicNav = [
     { name: "Home", path: "/", icon: LayoutDashboard },
-    { name: "Deals", path: "/deals/today", icon: Heart },
+    { name: "Deals", path: "/deals", icon: Heart },
     { name: "About Us", path: "/about", icon: Info },
     { name: "FAQs", path: "/faqs", icon: HelpCircle },
     { name: "Contact Us", path: "/contact", icon: MessageSquare },

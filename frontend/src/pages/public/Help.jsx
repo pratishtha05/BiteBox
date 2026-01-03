@@ -11,19 +11,26 @@ const Help = () => {
   ];
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">Need Help?</h1>
+    <div className="p-6 rounded-xl ">
+      {/* Heading */}
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">
+        Need Help?
+      </h1>
+      <p className="text-gray-700 text-center mb-10">
+        Choose one of the options below to quickly find answers or get in touch with our team.
+      </p>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* Help Sections */}
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
         {sections.map((sec, idx) => (
           <Link
             key={idx}
             to={sec.link}
-            className="bg-white shadow-lg p-6 rounded-xl hover:scale-105 transition transform"
+            className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl hover:scale-[1.03] transition-transform duration-200 flex flex-col items-start"
           >
-            <sec.icon className="w-8 h-8 text-amber-500 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{sec.title}</h2>
-            <p className="text-gray-700">{sec.description}</p>
+            <sec.icon className="w-10 h-10 text-amber-500 mb-4" />
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">{sec.title}</h2>
+            <p className="text-gray-600 text-sm md:text-base">{sec.description}</p>
           </Link>
         ))}
       </div>

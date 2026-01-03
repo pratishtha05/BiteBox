@@ -71,6 +71,30 @@ router.get("/search", async (req, res) => {
   }
 });
 
+/* ---------------- PUBLIC DEALS ---------------- */
+router.get("/deals", async (req, res) => {
+  const now = new Date();
+
+  // 🔴 Auto-expire outdated deals
+  await Deal.updateMany(
+    {
+      isActive: true,
+      validTill: { $lt: now },
+    },
+    {
+      $set: { isActive: false },
+    }
+  );
+
+  // ✅ Fetch only active + valid deals
+  const deals = await Deal.find({
+    isActive: true,
+    $or: [{ validTill: null }, { validTill: { $gte: now } }],
+  }).sort({ createdAt: -1 });
+
+  res.json(deals);
+});
+
 /**
  * GET menu for users
  */
@@ -105,21 +129,5 @@ router.post("/contact", async (req, res) => {
 });
 
 const Deal = require("../models/deal.model");
-
-/* ---------------- PUBLIC DEALS ---------------- */
-router.get("/deals/:type", async (req, res) => {
-  const deals = await Deal.find({
-    dealType: req.params.type.toLowerCase(),
-    isActive: true,
-  }).sort({ createdAt: -1 });
-
-  res.json(deals);
-});
-
-router.get("/deals", async (req, res) => {
-  const deals = await Deal.find({ isActive: true }).sort({ createdAt: -1 });
-  res.json(deals);
-});
-
 
 module.exports = router;
