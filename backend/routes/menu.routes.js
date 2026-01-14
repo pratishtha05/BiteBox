@@ -21,13 +21,7 @@ router.get("/", auth, async (req, res) => {
     isDeleted: false,
   }).sort({ createdAt: -1 });
 
-  // prepend server URL to image if exists
-  const itemsWithFullImage = items.map((item) => ({
-    ...item.toObject(),
-    image: item.image ? `${process.env.SERVER_URL}${item.image}` : "",
-  }));
-
-  res.json(itemsWithFullImage);
+  res.json(items);
 });
 
 // CREATE menu item
