@@ -3,6 +3,7 @@ const router = express.Router();
 const Restaurant = require("../models/restaurant.model");
 const MenuItem = require("../models/menu.model");
 const Contact = require("../models/contact.model");
+const transporter = require("../utils/mailer");
 
 router.get("/restaurants", async (req, res) => {
   try {
@@ -116,7 +117,33 @@ router.post("/contact", async (req, res) => {
       return res.status(400).json({ message: "All fields are required." });
     }
 
+    // 1️⃣ Save to DB
     const newContact = await Contact.create({ name, email, message });
+
+    // 2️⃣ Email to Admin
+    await transporter.sendMail({
+      from: `"Contact Form" <${process.env.ADMIN_EMAIL}>`,
+      to: process.env.ADMIN_EMAIL,
+      subject: "New Contact Form Submission",
+      html: `
+        <h3>New Message Received</h3>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Message:</b><br/>${message}</p>
+      `,
+    });
+
+    // 3️⃣ Thank-you Email to User
+    await transporter.sendMail({
+      from: `"Support Team" <${process.env.ADMIN_EMAIL}>`,
+      to: email,
+      subject: "Thank you for contacting us",
+      html: `
+        <p>Hi ${name},</p>
+        <p>Thank you for reaching out to us. We have received your message and our team will contact you shortly.</p>
+        <p>Best regards,<br/>Team</p>
+      `,
+    });
 
     res.status(201).json({
       message: "Your message has been received. We'll get back to you soon!",

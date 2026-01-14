@@ -64,14 +64,6 @@ const Navbar = () => {
           {role === "user" && (
             <>
               <button
-                className="relative text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
-                title="Notifications"
-              >
-                <Bell size={24} />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
-
-              <button
                 className="relative flex items-center justify-center w-10 h-10  rounded-full text-gray-600 hover:text-amber-500 transition cursor-pointer active:scale-95"
                 title="Cart"
                 onClick={() => setCartOpen(true)}
@@ -83,14 +75,6 @@ const Navbar = () => {
                   </span>
                 )}
               </button>
-
-              <button
-                className="text-gray-600 hover:text-amber-500 transition hover:cursor-pointer active:scale-95"
-                title="Profile"
-              >
-                <User size={24} />
-              </button>
-
               <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
             </>
           )}

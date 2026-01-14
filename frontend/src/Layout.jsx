@@ -30,7 +30,7 @@ const Layout = ({ children }) => {
         {showNavbar && <div className="shrink-0"><Navbar /></div>}
 
         {/* Scrollable main content */}
-        <main className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+        <main className="flex-1 overflow-y-auto p-4 hide-scrollbar">
           {children}
         </main>
       </div>

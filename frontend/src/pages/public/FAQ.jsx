@@ -14,7 +14,7 @@ const FAQ = () => {
   const toggle = (index) => setOpenIndex(openIndex === index ? null : index);
 
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="p-6">
       {/* Page Heading */}
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-6">
         Frequently Asked Questions
@@ -31,7 +31,7 @@ const FAQ = () => {
           >
             <button
               className={`w-full flex justify-between items-center px-6 py-4 text-left font-medium text-gray-900 
-                         focus:outline-none transition-colors ${
+                         focus:outline-none transition-colors hover:cursor-pointer ${
                            openIndex === idx ? "bg-amber-50" : "bg-white hover:bg-amber-50"
                          }`}
               onClick={() => toggle(idx)}
