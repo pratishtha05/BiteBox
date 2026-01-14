@@ -73,14 +73,23 @@ const SearchResults = () => {
               className="relative cursor-pointer rounded-2xl bg-white shadow-md overflow-hidden 
                  transition-transform hover:scale-[1.01] hover:shadow-lg"
             >
-              {/* Icon Container (same as Home) */}
-              <div className="h-40 flex items-center justify-center bg-amber-50">
-                <div
-                  className="w-20 h-20 rounded-2xl bg-white shadow 
-                        flex items-center justify-center text-amber-500"
-                >
-                  {getCategoryIcon(restaurant.categories)}
-                </div>
+              {/* Restaurant Image */}
+              <div className="h-40 bg-amber-50 overflow-hidden flex items-center justify-center">
+                {restaurant.image ? (
+                  <img
+                    src={`http://localhost:3000${restaurant.image}`}
+                    alt={restaurant.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = "none"; // fallback to icon
+                    }}
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-white shadow flex items-center justify-center text-amber-500">
+                    {getCategoryIcon(restaurant.categories)}
+                  </div>
+                )}
               </div>
 
               {/* Category Badge */}

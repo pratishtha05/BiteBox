@@ -3,7 +3,6 @@ const MenuItem = require("../models/menu.model");
 const auth = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload");
 
-
 const router = express.Router();
 
 /**
@@ -22,7 +21,13 @@ router.get("/", auth, async (req, res) => {
     isDeleted: false,
   }).sort({ createdAt: -1 });
 
-  res.json(items);
+  // prepend server URL to image if exists
+  const itemsWithFullImage = items.map((item) => ({
+    ...item.toObject(),
+    image: item.image ? `${process.env.SERVER_URL}${item.image}` : "",
+  }));
+
+  res.json(itemsWithFullImage);
 });
 
 // CREATE menu item
@@ -40,23 +45,36 @@ router.post(
       restaurant: req.auth.id,
     });
 
-    res.status(201).json(item);
+    res.status(201).json({
+      ...item.toObject(),
+      image: item.image ? `${process.env.SERVER_URL}${item.image}` : "",
+    });
   }
 );
 
-
 // UPDATE menu item
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, upload.single("image"), async (req, res) => {
+  if (req.auth.role !== "restaurant")
+    return res.status(403).json({ message: "Forbidden" });
+
+  const updateData = { ...req.body };
+  if (req.file) {
+    updateData.image = `/uploads/${req.file.filename}`;
+  }
+
   const item = await MenuItem.findOneAndUpdate(
     { _id: req.params.id, restaurant: req.auth.id },
-    req.body,
+    updateData,
     { new: true }
   );
 
-  res.json(item);
+  res.json({
+    ...item.toObject(),
+    image: item.image ? `${process.env.SERVER_URL}${item.image}` : "",
+  });
 });
 
-// SOFT DELETE
+// SOFT DELETE menu item
 router.delete("/:id", auth, async (req, res) => {
   await MenuItem.findOneAndUpdate(
     { _id: req.params.id, restaurant: req.auth.id },
@@ -72,6 +90,7 @@ router.delete("/:id", auth, async (req, res) => {
  * =========================
  */
 
+// GET menu for a specific restaurant
 router.get("/restaurant/:restaurantId", async (req, res) => {
   const items = await MenuItem.find({
     restaurant: req.params.restaurantId,

@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
   const [menu, setMenu] = useState([]);
-  const { addToCart, restaurantId: cartRestaurantId } = useCart();
+  const { addToCart } = useCart();
   const { isAuthenticated, role } = useAuth();
 
   useEffect(() => {
@@ -51,6 +51,13 @@ const RestaurantMenu = () => {
             className="bg-white rounded-xl shadow p-4 flex flex-col justify-between"
           >
             <div>
+              {item.image && (
+                <img
+                  src={`http://localhost:3000${item.image}`}
+                  alt={item.name}
+                  className="w-full h-40 object-cover rounded-lg mb-2"
+                />
+              )}
               <h3 className="font-medium text-lg capitalize">{item.name}</h3>
               <p className="text-sm text-gray-500">{item.description}</p>
               <p className="font-semibold mt-2">₹{item.price}</p>

@@ -34,55 +34,53 @@ const Menu = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("name", form.name);
-  formData.append("price", Number(form.price));
-  formData.append("description", form.description);
-  formData.append("category", form.category);
-  formData.append("isAvailable", form.isAvailable);
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("price", Number(form.price));
+    formData.append("description", form.description);
+    formData.append("category", form.category);
+    formData.append("isAvailable", form.isAvailable);
 
-  if (form.image) {
-    formData.append("image", form.image);
-  }
-
-  try {
-    if (editingId) {
-      await axios.put(
-        `http://localhost:3000/menu/${editingId}`,
-        formData,
-        { headers } // ❗ DO NOT set Content-Type
-      );
-    } else {
-      await axios.post(
-        "http://localhost:3000/menu/createMenuItem",
-        formData,
-        { headers }
-      );
+    if (form.image instanceof File) {
+      formData.append("image", form.image);
     }
 
-    setForm(initialFormState);
-    setEditingId(null);
-    fetchMenu();
-  } catch (err) {
-    console.error(err.response?.data || err.message);
-  }
-};
+    try {
+      if (editingId) {
+        await axios.put(
+          `http://localhost:3000/menu/${editingId}`,
+          formData,
+          { headers } // DO NOT set content-type, browser will handle multipart
+        );
+      } else {
+        await axios.post(
+          "http://localhost:3000/menu/createMenuItem",
+          formData,
+          { headers }
+        );
+      }
 
+      setForm(initialFormState);
+      setEditingId(null);
+      fetchMenu();
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
 
   const handleEdit = (item) => {
-  setForm({
-    name: item.name,
-    price: item.price,
-    description: item.description || "",
-    category: item.category || "",
-    image: null,
-    isAvailable: item.isAvailable,
-  });
-  setEditingId(item._id);
-};
-
+    setForm({
+      name: item.name,
+      price: item.price,
+      description: item.description || "",
+      category: item.category || "",
+      image: null, // reset file input
+      isAvailable: item.isAvailable,
+    });
+    setEditingId(item._id);
+  };
 
   const toggleAvailability = async (item) => {
     try {
@@ -97,14 +95,9 @@ const Menu = () => {
     }
   };
 
-  // Soft delete (isDeleted = true)
   const handleDelete = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:3000/menu/${id}`,
-        { isDeleted: true },
-        { headers }
-      );
+      await axios.delete(`http://localhost:3000/menu/${id}`, { headers });
       fetchMenu();
     } catch (err) {
       console.error(err.response?.data || err.message);
@@ -180,7 +173,7 @@ const Menu = () => {
 
             {item.image ? (
               <img
-                src={item.image}
+                src={`http://localhost:3000${item.image}`}
                 alt={item.name}
                 className="h-32 w-full object-cover rounded-lg mb-3"
               />
@@ -191,7 +184,6 @@ const Menu = () => {
             )}
 
             <h4 className="text-lg font-semibold capitalize">{item.name}</h4>
-
             <p className="text-gray-600">₹{item.price}</p>
             <p className="text-sm text-gray-500">{item.category}</p>
 
