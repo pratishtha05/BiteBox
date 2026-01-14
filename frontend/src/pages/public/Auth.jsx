@@ -28,6 +28,7 @@ const Auth = () => {
     name: "",
     email: "",
     password: "",
+    image: null,
     phone: "",
     gender: "",
     restaurantId: "",
@@ -45,75 +46,95 @@ const Auth = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      // ---------- FRONTEND VALIDATION ----------
-      if (
-        isSignup &&
-        formData.role === "restaurant" &&
-        formData.categories.length === 0
-      ) {
-        throw new Error("Please select at least one category");
-      }
-
-      // ---------- PREPARE PAYLOAD ----------
-      let payload;
-      if (isSignup) {
-        if (formData.role === "restaurant") {
-          payload = {
-            restaurantId: formData.restaurantId,
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-            address: formData.address,
-            categories: formData.categories,
-          };
-        } else if (formData.role === "user") {
-          payload = {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-            gender: formData.gender,
-          };
-        } else if (formData.role === "delivery") {
-          payload = {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-          };
-        }
-      } else {
-        payload = { email: formData.email, password: formData.password };
-      }
-
-      // ---------- CALL AUTH CONTEXT ----------
-      if (isSignup) {
-        await signup(formData.role, payload);
-      } else {
-        await login(formData.role, payload);
-      }
-
-      // Role-based redirect
-      if (formData.role === "admin")
-        navigate("/admin/dashboard", { replace: true });
-      else if (formData.role === "restaurant")
-        navigate("/restaurant/dashboard", { replace: true });
-      else if (formData.role === "delivery")
-        navigate("/delivery/dashboard", { replace: true });
-      else navigate("/", { replace: true });
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+  try {
+    // ---------- FRONTEND VALIDATION ----------
+    if (
+      isSignup &&
+      formData.role === "restaurant" &&
+      formData.categories.length === 0
+    ) {
+      throw new Error("Please select at least one category");
     }
-  };
+
+    let payload;
+
+    // ---------- SIGNUP ----------
+    if (isSignup) {
+      if (formData.role === "restaurant") {
+        // Use FormData for restaurant signup (image upload)
+        payload = new FormData();
+        payload.append("restaurantId", formData.restaurantId);
+        payload.append("name", formData.name);
+        payload.append("email", formData.email);
+        payload.append("password", formData.password);
+        payload.append("phone", formData.phone);
+        payload.append("address", formData.address);
+        formData.categories.forEach((cat) => payload.append("categories[]", cat));
+        if (formData.image) payload.append("image", formData.image);
+
+        // Call signup with FormData
+        const res = await signup(formData.role, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        // Redirect after signup
+        navigate("/restaurant/dashboard", { replace: true });
+      } else if (formData.role === "user") {
+        payload = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          gender: formData.gender,
+        };
+
+        const res = await signup(formData.role, payload);
+        navigate("/", { replace: true });
+      } else if (formData.role === "delivery") {
+        payload = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+        };
+
+        const res = await signup(formData.role, payload);
+        navigate("/delivery/dashboard", { replace: true });
+      }
+    } 
+    // ---------- LOGIN ----------
+    else {
+      payload = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      await login(formData.role, payload);
+
+      if (formData.role === "admin") navigate("/admin/dashboard", { replace: true });
+      else if (formData.role === "restaurant") navigate("/restaurant/dashboard", { replace: true });
+      else if (formData.role === "delivery") navigate("/delivery/dashboard", { replace: true });
+      else navigate("/", { replace: true });
+    }
+  } catch (err) {
+    // Handles backend messages and frontend validation errors
+    setError(
+      err.response?.data?.message ||
+      err.response?.data?.errors?.[0]?.msg ||
+      err.message ||
+      "Something went wrong"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -121,7 +142,9 @@ const Auth = () => {
         {/* Step 1: Choose Role */}
         {step === "role" && (
           <>
-            <h1 className="text-3xl font-semibold text-center mb-2">Welcome!</h1>
+            <h1 className="text-3xl font-semibold text-center mb-2">
+              Welcome!
+            </h1>
             <p className="text-center text-gray-500 mb-8">
               Choose how you want to continue
             </p>
@@ -130,8 +153,16 @@ const Auth = () => {
             <div className="space-y-4">
               {[
                 { role: "user", icon: <User />, label: "User" },
-                { role: "restaurant", icon: <Store />, label: "Restaurant Owner" },
-                { role: "delivery", icon: <Truck />, label: "Delivery Partner" },
+                {
+                  role: "restaurant",
+                  icon: <Store />,
+                  label: "Restaurant Owner",
+                },
+                {
+                  role: "delivery",
+                  icon: <Truck />,
+                  label: "Delivery Partner",
+                },
                 { role: "admin", icon: <Shield />, label: "Admin" },
               ].map(({ role, icon, label }) => (
                 <button
@@ -145,10 +176,14 @@ const Auth = () => {
                   hover:border-amber-500 hover:bg-amber-50 transition hover:cursor-pointer active:scale-95"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <span className="group-hover:text-amber-500 transition">{icon}</span>
+                    <span className="group-hover:text-amber-500 transition">
+                      {icon}
+                    </span>
                     <span className="font-medium">{label}</span>
                   </div>
-                  <span className="text-gray-400 group-hover:text-amber-500">→</span>
+                  <span className="text-gray-400 group-hover:text-amber-500">
+                    →
+                  </span>
                 </button>
               ))}
             </div>
@@ -168,7 +203,9 @@ const Auth = () => {
             </button>
 
             {/* Error Messages */}
-            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
+            )}
 
             {/* heading */}
             <h2 className="text-2xl font-semibold text-center">
@@ -242,6 +279,18 @@ const Auth = () => {
                       className="w-full mt-1 px-4 py-2 border rounded-lg"
                     />
                     <label className="text-sm font-medium">
+                      Logo
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setFormData({ ...formData, image: e.target.files[0] })
+                      }
+                      className="w-full mt-1 px-4 py-2 border rounded-lg"
+                    />
+
+                    <label className="text-sm font-medium">
                       Name <span className="text-amber-600">*</span>
                     </label>
                     <input
@@ -276,7 +325,9 @@ const Auth = () => {
                     </label>
                     <div className="flex flex-wrap gap-3 pt-2">
                       {CATEGORY_OPTIONS.map((category) => {
-                        const selected = formData.categories.includes(category.value);
+                        const selected = formData.categories.includes(
+                          category.value
+                        );
                         return (
                           <button
                             type="button"
@@ -285,7 +336,9 @@ const Auth = () => {
                               setFormData((prev) => ({
                                 ...prev,
                                 categories: selected
-                                  ? prev.categories.filter((c) => c !== category.value)
+                                  ? prev.categories.filter(
+                                      (c) => c !== category.value
+                                    )
                                   : [...prev.categories, category.value],
                               }));
                             }}

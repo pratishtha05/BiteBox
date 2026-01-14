@@ -61,11 +61,12 @@ const Restaurants = () => {
   };
 
   if (loading)
-    return <p className="text-center py-10 text-gray-500">Loading restaurants...</p>;
+    return (
+      <p className="text-center py-10 text-gray-500">Loading restaurants...</p>
+    );
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-     
       {message.text && (
         <p
           className={`p-3 rounded-md text-center ${
@@ -95,6 +96,15 @@ const Restaurants = () => {
                 }
               >
                 <div className="flex flex-col sm:flex-row sm:gap-6">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={restaurant.image || "/placeholder-restaurant.jpg"}
+                      alt={restaurant.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <span className="font-medium">{restaurant.name}</span>
+                  </div>
+
                   <span className="font-medium text-gray-900">
                     {restaurant.name}
                   </span>
@@ -102,9 +112,7 @@ const Restaurants = () => {
                   <span className="text-gray-500">{restaurant.phone}</span>
                   <span
                     className={`font-semibold ${
-                      restaurant.isBlocked
-                        ? "text-red-600"
-                        : "text-green-600"
+                      restaurant.isBlocked ? "text-red-600" : "text-green-600"
                     }`}
                   >
                     {restaurant.isBlocked
@@ -171,7 +179,10 @@ const Restaurants = () => {
                   <p>
                     <strong>Address:</strong> {restaurant.address}
                   </p>
-                  <p><strong>Categories:</strong> {restaurant.categories.join(", ")}</p>
+                  <p>
+                    <strong>Categories:</strong>{" "}
+                    {restaurant.categories.join(", ")}
+                  </p>
                 </div>
               )}
             </div>

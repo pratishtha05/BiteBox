@@ -1,6 +1,8 @@
 const express = require("express");
 const MenuItem = require("../models/menu.model");
 const auth = require("../middlewares/auth.middleware");
+const upload = require("../middlewares/upload");
+
 
 const router = express.Router();
 
@@ -24,17 +26,24 @@ router.get("/", auth, async (req, res) => {
 });
 
 // CREATE menu item
-router.post("/createMenuItem", auth, async (req, res) => {
-  if (req.auth.role !== "restaurant")
-    return res.status(403).json({ message: "Forbidden" });
+router.post(
+  "/createMenuItem",
+  auth,
+  upload.single("image"),
+  async (req, res) => {
+    if (req.auth.role !== "restaurant")
+      return res.status(403).json({ message: "Forbidden" });
 
-  const item = await MenuItem.create({
-    ...req.body,
-    restaurant: req.auth.id,
-  });
+    const item = await MenuItem.create({
+      ...req.body,
+      image: req.file ? `/uploads/${req.file.filename}` : "",
+      restaurant: req.auth.id,
+    });
 
-  res.status(201).json(item);
-});
+    res.status(201).json(item);
+  }
+);
+
 
 // UPDATE menu item
 router.put("/:id", auth, async (req, res) => {

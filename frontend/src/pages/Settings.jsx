@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Upload } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Settings = () => {
@@ -16,6 +16,7 @@ const Settings = () => {
     phone: "",
     gender: "",
     address: "",
+    image: "",
   });
 
   const [passwords, setPasswords] = useState({
@@ -32,6 +33,7 @@ const Settings = () => {
     setTimeout(() => setMessage({ text: "", type: "" }), duration);
   };
 
+  // ---------------- FETCH PROFILE ----------------
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -39,16 +41,24 @@ const Settings = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = {
+        setForm({
           name: res.data.name || "",
           email: res.data.email || "",
           phone: res.data.phone || "",
           gender: res.data.gender || "",
           address: res.data.address || "",
+          image: res.data.image || "",
+        });
+
+        originalForm.current = {
+          name: res.data.name || "",
+          email: res.data.email || "",
+          phone: res.data.phone || "",
+          gender: res.data.gender || "",
+          address: res.data.address || "",
+          image: res.data.image || "",
         };
 
-        setForm(data);
-        originalForm.current = data;
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -60,19 +70,50 @@ const Settings = () => {
     fetchProfile();
   }, [role, token]);
 
+  // ---------------- HANDLE PROFILE UPDATE ----------------
   const handleUpdateProfile = async () => {
     try {
-      await axios.put(`http://localhost:3000/${role}/update`, form, {
+      const res = await axios.put(`http://localhost:3000/${role}/update`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       showMessage("Profile updated successfully", "success");
-      originalForm.current = form;
+      setForm(res.data);
+      originalForm.current = res.data;
     } catch (err) {
       console.error(err);
       showMessage("Profile update failed", "error");
     }
   };
 
+  // ---------------- HANDLE IMAGE UPLOAD ----------------
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/${role}/upload-image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setForm({ ...form, image: res.data.image });
+      showMessage("Profile image updated", "success");
+    } catch (err) {
+      console.error(err);
+      showMessage("Failed to upload image", "error");
+    }
+  };
+
+  // ---------------- HANDLE PASSWORD CHANGE ----------------
   const handleChangePassword = async () => {
     if (passwords.newPassword !== passwords.confirmPassword)
       return showMessage("Passwords do not match", "error");
@@ -94,6 +135,7 @@ const Settings = () => {
     }
   };
 
+  // ---------------- HANDLE ACCOUNT DELETE ----------------
   const handleDeleteAccount = async () => {
     const password = prompt("Please enter your password to confirm:");
     if (!password) return;
@@ -150,9 +192,35 @@ const Settings = () => {
         ))}
       </div>
 
-      {/* Account Settings */}
+      {/* ---------------- ACCOUNT SETTINGS ---------------- */}
       {activeTab === "Account Settings" && (
         <div className="flex flex-col gap-6">
+          {/* Profile Image */}
+          <div className="flex flex-row items-center gap-2">
+            {form.image ? (
+              <img
+                src={form.image}
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover border-2 border-amber-400"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-amber-400">
+                <span className="text-xl font-bold">{form.name?.charAt(0) || "U"}</span>
+              </div>
+            )}
+            <label className="flex items-center gap-2 mt-2 cursor-pointer text-amber-600 hover:underline">
+              <Upload size={18} />
+              <span>Change Profile Picture</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* Profile Form */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               placeholder="Full Name"

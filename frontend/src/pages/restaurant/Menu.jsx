@@ -34,51 +34,55 @@ const Menu = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const payload = {
-      name: form.name,
-      price: Number(form.price),
-      description: form.description,
-      category: form.category,
-      image: form.image,
-      isAvailable: form.isAvailable,
-    };
+  const formData = new FormData();
+  formData.append("name", form.name);
+  formData.append("price", Number(form.price));
+  formData.append("description", form.description);
+  formData.append("category", form.category);
+  formData.append("isAvailable", form.isAvailable);
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:3000/menu/${editingId}`,
-          payload,
-          { headers }
-        );
-      } else {
-        await axios.post(
-          "http://localhost:3000/menu/createMenuItem",
-          payload,
-          { headers }
-        );
-      }
+  if (form.image) {
+    formData.append("image", form.image);
+  }
 
-      setForm(initialFormState);
-      setEditingId(null);
-      fetchMenu();
-    } catch (err) {
-      console.error(err.response?.data || err.message);
+  try {
+    if (editingId) {
+      await axios.put(
+        `http://localhost:3000/menu/${editingId}`,
+        formData,
+        { headers } // ❗ DO NOT set Content-Type
+      );
+    } else {
+      await axios.post(
+        "http://localhost:3000/menu/createMenuItem",
+        formData,
+        { headers }
+      );
     }
-  };
+
+    setForm(initialFormState);
+    setEditingId(null);
+    fetchMenu();
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  }
+};
+
 
   const handleEdit = (item) => {
-    setForm({
-      name: item.name,
-      price: item.price,
-      description: item.description || "",
-      category: item.category || "",
-      image: item.image || "",
-      isAvailable: item.isAvailable,
-    });
-    setEditingId(item._id);
-  };
+  setForm({
+    name: item.name,
+    price: item.price,
+    description: item.description || "",
+    category: item.category || "",
+    image: null,
+    isAvailable: item.isAvailable,
+  });
+  setEditingId(item._id);
+};
+
 
   const toggleAvailability = async (item) => {
     try {
@@ -109,9 +113,7 @@ const Menu = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Manage Menu
-      </h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Manage Menu</h2>
 
       {/* FORM */}
       <form
@@ -143,9 +145,9 @@ const Menu = () => {
         />
 
         <input
-          placeholder="Image URL"
-          value={form.image}
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
+          type="file"
+          accept="image/*"
+          onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
           className="border p-3 rounded-lg"
         />
 
@@ -188,17 +190,13 @@ const Menu = () => {
               </div>
             )}
 
-            <h4 className="text-lg font-semibold capitalize">
-              {item.name}
-            </h4>
+            <h4 className="text-lg font-semibold capitalize">{item.name}</h4>
 
             <p className="text-gray-600">₹{item.price}</p>
             <p className="text-sm text-gray-500">{item.category}</p>
 
             {item.description && (
-              <p className="text-sm text-gray-400 mt-1">
-                {item.description}
-              </p>
+              <p className="text-sm text-gray-400 mt-1">{item.description}</p>
             )}
 
             {/* Actions */}

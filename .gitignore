@@ -33,6 +33,7 @@ backend/build/
 backend/coverage/
 backend/logs/
 backend/tmp/
+backend/uploads/
 
 # =========================
 # Database files

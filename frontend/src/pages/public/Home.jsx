@@ -69,7 +69,9 @@ const Dashboard = () => {
       {/* ---------------- CATEGORIES ---------------- */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">Categories</h2>
+          <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">
+            Categories
+          </h2>
 
           {selectedCategory && (
             <button
@@ -134,10 +136,22 @@ const Dashboard = () => {
              transition-transform hover:scale-[1.01] hover:shadow-lg"
             >
               {/* Restaurant Image */}
-              <div className="h-40 flex items-center justify-center bg-amber-50">
-                <div className="w-20 h-20 rounded-2xl bg-white shadow flex items-center justify-center text-amber-500">
-                  {getCategoryIcon(restaurant.categories)}
-                </div>
+              <div className="h-40 bg-amber-50 overflow-hidden flex items-center justify-center">
+                {restaurant.image ? (
+                  <img
+                    src={`http://localhost:3000${restaurant.image}`}
+                    alt={restaurant.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = "none"; // fallback to icon
+                    }}
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-white shadow flex items-center justify-center text-amber-500">
+                    {getCategoryIcon(restaurant.categories)}
+                  </div>
+                )}
               </div>
 
               {/* Category Badge */}

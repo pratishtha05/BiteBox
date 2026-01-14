@@ -10,6 +10,8 @@ const Restaurant = require("../models/restaurant.model");
 const Admin = require("../models/admin.model");
 const DeliveryPartner = require("../models/deliveryPartner.model");
 
+const upload = require("../middlewares/upload");  
+
 // Environment variable for JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -100,50 +102,24 @@ router.post(
 // Restaurant Signup
 router.post(
   "/restaurant/signup",
-  [
-    body("restaurantId").notEmpty().withMessage("Restaurant ID is required"),
-    body("name").notEmpty().withMessage("Name is required"),
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters"),
-    body("phone").notEmpty().withMessage("Phone is required"),
-    body("address").notEmpty().withMessage("Address is required"),
-    body("categories")
-      .isArray({ min: 1 })
-      .withMessage("At least one category is required"),
-  ],
+  upload.single("image"),
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
-
     try {
-      const {
-        restaurantId,
-        name,
-        email,
-        password,
-        phone,
-        address,
-        categories,
-      } = req.body;
+      const { restaurantId, name, email, password, phone, address } = req.body;
+
+      const categories = Array.isArray(req.body.categories)
+        ? req.body.categories
+        : [req.body.categories];
 
       const existingRestaurant = await Restaurant.findOne({
         $or: [{ email }, { restaurantId: Number(restaurantId) }],
       });
 
       if (existingRestaurant) {
-        return res.status(400).json({
-          message: "Restaurant with this Email or Restaurant ID already exists",
-        });
+        return res.status(400).json({ message: "Restaurant already exists" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      const normalizedCategories = categories.map((c) =>
-        c.toLowerCase().trim()
-      );
 
       const restaurant = await Restaurant.create({
         restaurantId: Number(restaurantId),
@@ -152,25 +128,18 @@ router.post(
         password: hashedPassword,
         phone,
         address,
-        categories: normalizedCategories,
+        categories,
+        image: req.file ? `/uploads/${req.file.filename}` : "",
       });
 
       const token = jwt.sign(
         { id: restaurant._id, role: "restaurant" },
         JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
+        { expiresIn: "7d" }
       );
 
       res.status(201).json({ restaurant, token, role: "restaurant" });
     } catch (error) {
-      if (error.code === 11000) {
-        return res.status(400).json({
-          message: "Restaurant with this Email or Restaurant ID already exists",
-        });
-      }
-
       console.error(error);
       res.status(500).json({ message: "Server Error" });
     }
@@ -180,27 +149,23 @@ router.post(
 // Restaurant Login
 router.post(
   "/restaurant/login",
-  [
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("password").notEmpty().withMessage("Password is required"),
-  ],
+  express.json(), // Important: make sure JSON body parser is used
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
-
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password required" });
+      }
 
       const restaurant = await Restaurant.findOne({ email });
       if (!restaurant)
         return res.status(400).json({ message: "Invalid credentials" });
 
-      if (restaurant.isBlocked) {
+      if (restaurant.isBlocked)
         return res.status(403).json({
           message: `Restaurant is blocked: ${restaurant.blockReason}`,
         });
-      }
 
       const isMatch = await bcrypt.compare(password, restaurant.password);
       if (!isMatch)
@@ -209,17 +174,17 @@ router.post(
       const token = jwt.sign(
         { id: restaurant._id, role: "restaurant" },
         JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
+        { expiresIn: "7d" }
       );
 
       res.status(200).json({ restaurant, token, role: "restaurant" });
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: "Server Error" });
     }
   }
 );
+
 
 // Admin Login
 router.post(

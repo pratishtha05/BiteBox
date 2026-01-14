@@ -129,9 +129,18 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.post(`http://localhost:3000/auth/${role}/signup`, payload);
-      // Auto login after signup
+      // Auto-login for restaurant
+    if (role === "restaurant") {
+      const loginPayload = {
+        email: payload.get("email"),
+        password: payload.get("password"),
+      };
+      await login(role, loginPayload);
+    } else {
       await login(role, payload);
-      return res.data;
+    }
+
+    return res.data;
     } catch (err) {
       throw new Error(err?.response?.data?.message || err.message || "Signup failed");
     }

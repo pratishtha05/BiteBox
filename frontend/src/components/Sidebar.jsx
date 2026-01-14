@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
+  Home,
   LayoutDashboard,
   Heart,
   History,
@@ -18,7 +19,7 @@ const Sidebar = () => {
 
   // Public nav
   const publicNav = [
-    { name: "Home", path: "/", icon: LayoutDashboard },
+    { name: "Home", path: "/", icon: Home },
     { name: "Deals", path: "/deals", icon: Heart },
     { name: "About Us", path: "/about", icon: Info },
     { name: "FAQs", path: "/faqs", icon: HelpCircle },
@@ -27,7 +28,7 @@ const Sidebar = () => {
 
   // User nav
   const userNav = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Home", path: "/", icon: Home },
     { name: "My Orders", path: "/orders", icon: History },
     { name: "Favorites", path: "/favorites", icon: Heart },
     { name: "Messages", path: "/messages", icon: MessageSquare },
@@ -36,9 +37,9 @@ const Sidebar = () => {
 
   // Restaurant nav
   const restaurantNav = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Home", path: "/", icon: Home },
     {
-      name: "Restaurant Dashboard",
+      name: "Dashboard",
       path: "/restaurant/dashboard",
       icon: LayoutDashboard,
     },
@@ -49,13 +50,14 @@ const Sidebar = () => {
       path: "/restaurant/delivery-partners",
       icon: Shield,
     },
+    { name: "Settings", path: "/settings", icon: Settings },
   ];
 
   // Admin nav
   const adminNav = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Home", path: "/", icon: Home },
     {
-      name: "Admin Dashboard",
+      name: "Dashboard",
       path: "/admin/dashboard",
       icon: LayoutDashboard,
     },
