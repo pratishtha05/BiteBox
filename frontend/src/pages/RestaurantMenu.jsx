@@ -42,8 +42,6 @@ const RestaurantMenu = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-6">Menu</h2>
-
       <div className="grid md:grid-cols-3 gap-6">
         {menu.map((item) => (
           <div

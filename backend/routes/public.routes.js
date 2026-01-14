@@ -30,47 +30,55 @@ router.get("/restaurants", async (req, res) => {
 router.get("/search", async (req, res) => {
   try {
     const query = req.query.q?.toLowerCase().trim();
-
     if (!query) {
-      return res.json({ restaurants: [] });
+      return res.json({
+        restaurants: [],
+        foods: [],
+        categories: [],
+      });
     }
 
-    // 1️⃣ Restaurant name OR category match
-    const restaurantsByNameOrCategory = await Restaurant.find({
+    /* 1️⃣ Restaurants by name */
+    const restaurantsByName = await Restaurant.find({
       isBlocked: false,
-      $or: [{ name: { $regex: query, $options: "i" } }, { categories: query }],
+      name: { $regex: query, $options: "i" },
     });
 
-    // 2️⃣ Food match → get restaurant IDs
-    const foodMatches = await MenuItem.find({
+    /* 2️⃣ Restaurants by category */
+    const restaurantsByCategory = await Restaurant.find({
+      isBlocked: false,
+      categories: { $regex: query, $options: "i" },
+    });
+
+    /* 3️⃣ Food items */
+    const foods = await MenuItem.find({
       name: { $regex: query, $options: "i" },
       isAvailable: true,
       isDeleted: false,
-    }).select("restaurant");
+    }).populate("restaurant", "name image categories");
 
-    const restaurantIdsFromFood = foodMatches.map((item) => item.restaurant);
-
-    // 3️⃣ Fetch restaurants from food matches
-    const restaurantsFromFood = await Restaurant.find({
-      _id: { $in: restaurantIdsFromFood },
-      isBlocked: false,
-    });
-
-    // 4️⃣ Merge & remove duplicates
+    /* 4️⃣ Merge restaurants (remove duplicates) */
     const restaurantMap = new Map();
-
-    [...restaurantsByNameOrCategory, ...restaurantsFromFood].forEach((r) =>
+    [...restaurantsByName, ...restaurantsByCategory].forEach((r) =>
       restaurantMap.set(r._id.toString(), r)
     );
 
+    /* 5️⃣ Unique category matches */
+    const categories = [...new Set(
+      restaurantsByCategory.flatMap(r => r.categories)
+    )].filter(cat => cat.toLowerCase().includes(query));
+
     res.json({
       restaurants: Array.from(restaurantMap.values()),
+      foods,
+      categories,
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Search error:", error);
     res.status(500).json({ message: "Search failed" });
   }
 });
+
 
 /* ---------------- PUBLIC DEALS ---------------- */
 router.get("/deals", async (req, res) => {
