@@ -21,6 +21,7 @@ const orderSchema = new mongoose.Schema(
         },
         name: String,
         price: Number,
+        image: String,
         quantity: { type: Number, default: 1 },
       },
     ],
@@ -37,7 +38,7 @@ const orderSchema = new mongoose.Schema(
         "out for delivery",
         "completed",
       ],
-      default: "pending",
+      default: "placed",
     },
     deliveryPartner: {
       type: mongoose.Schema.Types.ObjectId,

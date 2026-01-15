@@ -35,11 +35,9 @@ const Router = () => {
             }
           />
           <Route
-            path="/confirmation/:orderId"
+            path="/confirmation"
             element={
-              <Layout>
                 <Confirmation />
-              </Layout>
             }
           />
           <Route

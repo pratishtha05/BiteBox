@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../models/order.model");
 const auth = require("../middlewares/auth.middleware");
+const MenuItem = require("../models/menu.model");
 
 /**
  * =========================
@@ -15,15 +16,32 @@ router.post("/create", auth, async (req, res) => {
     }
 
     const { restaurantId, items, totalAmount } = req.body;
-    console.log("Request body:", req.body);
-    console.log("Authenticated user:", req.auth);
+
+    // 🔥 Fetch menu items to snapshot data
+    const menuItems = await MenuItem.find({
+      _id: { $in: items.map(i => i.menuItem) }
+    });
+
+    const enrichedItems = items.map(item => {
+      const menu = menuItems.find(
+        m => m._id.toString() === item.menuItem
+      );
+
+      return {
+        menuItem: item.menuItem,
+        name: menu.name,
+        price: menu.price,
+        image: menu.image, // ✅ snapshot image
+        quantity: item.quantity,
+      };
+    });
 
     const order = await Order.create({
       customer: req.auth.id,
       restaurant: restaurantId,
-      items,
+      items: enrichedItems,
       totalAmount,
-      status: "placed"
+      status: "placed",
     });
 
     res.status(201).json(order);
@@ -31,6 +49,7 @@ router.post("/create", auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 /**
  * USER ORDERS

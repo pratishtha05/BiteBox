@@ -6,8 +6,8 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Cart = ({ isOpen, onClose }) => {
-  const navigate = useNavigate(); // add this
-  const { cart, restaurantId, updateQty, removeItem, clearCart } = useCart();
+  const navigate = useNavigate();
+  const { cart, restaurantId, updateQty, removeItem } = useCart();
   const { token } = useAuth();
 
   const totalAmount = cart.reduce(
@@ -15,29 +15,20 @@ const Cart = ({ isOpen, onClose }) => {
     0
   );
 
-  const placeOrder = async () => {
-    if (!cart.length) return;
+  const placeOrder = () => {
+  if (!cart.length) return;
 
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/order/create",
-        {
-          restaurantId,
-          items: cart,
-          totalAmount,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  onClose();
 
-      clearCart();
-      onClose();
+  navigate("/confirmation", {
+    state: {
+      restaurantId,
+      items: cart,
+      totalAmount,
+    },
+  });
+};
 
-      // Redirect to confirmation page with order ID
-      navigate(`/confirmation/${res.data._id}`);
-    } catch (err) {
-      alert(err.response?.data?.message || "Order failed");
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -46,7 +37,7 @@ const Cart = ({ isOpen, onClose }) => {
       {/* Overlay */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hover:cursor-pointer transition-opacity duration-300"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 cursor-pointer transition-opacity duration-300"
       />
 
       {/* Sidebar */}
@@ -56,10 +47,10 @@ const Cart = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-xl font-semibold text-gray-800">Your Cart</h2>
+          <h2 className="text-xl font-bold text-gray-800">Your Cart</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 hover:cursor-pointer active:scale-95 transition"
+            className="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition"
           >
             <X size={20} />
           </button>
@@ -77,38 +68,62 @@ const Cart = ({ isOpen, onClose }) => {
           {cart.map((item) => (
             <div
               key={item.menuItem}
-              className="bg-gray-50 rounded-2xl p-4 flex justify-between items-center shadow-sm hover:shadow-md transition"
+              className="flex gap-4 items-center bg-gray-50 rounded-2xl p-4 shadow-sm hover:shadow-md transition"
             >
-              {/* Item Info */}
-              <div>
-                <h4 className="font-medium text-gray-800">{item.name}</h4>
-                <p className="text-sm text-gray-500">₹{item.price}</p>
+              {/* Optional Image */}
+              <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+                {item.image ? (
+                  <img
+                    src={`http://localhost:3000${item.image}`}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-sm">No Image</span>
+                )}
               </div>
 
-              {/* Controls */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center border rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => updateQty(item.menuItem, Math.max(1, item.quantity - 1))}
-                    className="px-2 py-1 hover:bg-gray-200 hover:cursor-pointer active:scale-95 transition"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className="px-3 text-sm font-medium">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQty(item.menuItem, item.quantity + 1)}
-                    className="px-2 py-1 hover:bg-gray-200 hover:cursor-pointer active:scale-95 transition"
-                  >
-                    <Plus size={14} />
-                  </button>
+              {/* Item Info */}
+              <div className="flex-1 flex flex-col justify-between h-full">
+                <div>
+                  <h4 className="font-medium text-gray-800 capitalize">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-1">₹{item.price}</p>
                 </div>
 
-                <button
-                  onClick={() => removeItem(item.menuItem)}
-                  className="text-red-500 hover:text-red-600 text-sm hover:cursor-pointer active:scale-95 transition"
-                >
-                  Remove
-                </button>
+                {/* Quantity Controls */}
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center border rounded-lg overflow-hidden">
+                    <button
+                      onClick={() =>
+                        updateQty(item.menuItem, Math.max(1, item.quantity - 1))
+                      }
+                      className="px-2 py-1 hover:bg-gray-200 active:scale-95 transition"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="px-3 text-sm font-medium">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQty(item.menuItem, item.quantity + 1)}
+                      className="px-2 py-1 hover:bg-gray-200 active:scale-95 transition"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => removeItem(item.menuItem)}
+                    className="text-red-500 hover:text-red-600 text-sm active:scale-95 transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              {/* Item Total Price */}
+              <div className="font-semibold text-gray-800">
+                ₹{item.price * item.quantity}
               </div>
             </div>
           ))}
@@ -118,13 +133,13 @@ const Cart = ({ isOpen, onClose }) => {
         {cart.length > 0 && (
           <div className="px-6 py-4 border-t bg-white sticky bottom-0">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-gray-600">Total</span>
-              <span className="text-xl font-semibold text-gray-800">₹{totalAmount}</span>
+              <span className="text-gray-600 font-medium">Total</span>
+              <span className="text-xl font-bold text-gray-800">₹{totalAmount}</span>
             </div>
 
             <button
               onClick={placeOrder}
-              className="w-full bg-amber-500 text-white py-3 rounded-xl font-medium hover:bg-amber-600 hover:cursor-pointer active:scale-95 transition"
+              className="w-full bg-amber-500 text-white py-3 rounded-xl font-medium hover:bg-amber-600 active:scale-95 transition"
             >
               Checkout
             </button>
