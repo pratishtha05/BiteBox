@@ -41,11 +41,8 @@ const Dashboard = () => {
 
         const res = await axios.get(url);
 
-        const shuffled = [...res.data.restaurants].sort(
-          () => Math.random() - 0.5
-        );
+        setRestaurants(res.data.restaurants);
 
-        setRestaurants(shuffled);
       } catch (err) {
         console.error(err);
       } finally {
@@ -160,11 +157,11 @@ const Dashboard = () => {
               </div>
 
               {/* Category Badge */}
-              {restaurant.categories?.[0] && (
+              {/* {restaurant.categories?.[0] && (
                 <span className="absolute top-3 right-3 text-xs px-3 py-1 rounded-full bg-amber-500 text-white font-semibold shadow-md">
                   {restaurant.categories[0]}
                 </span>
-              )}
+              )} */}
 
               {/* Restaurant Details */}
               <div className="p-4">

@@ -46,95 +46,98 @@ const Auth = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    // ---------- FRONTEND VALIDATION ----------
-    if (
-      isSignup &&
-      formData.role === "restaurant" &&
-      formData.categories.length === 0
-    ) {
-      throw new Error("Please select at least one category");
-    }
-
-    let payload;
-
-    // ---------- SIGNUP ----------
-    if (isSignup) {
-      if (formData.role === "restaurant") {
-        // Use FormData for restaurant signup (image upload)
-        payload = new FormData();
-        payload.append("restaurantId", formData.restaurantId);
-        payload.append("name", formData.name);
-        payload.append("email", formData.email);
-        payload.append("password", formData.password);
-        payload.append("phone", formData.phone);
-        payload.append("address", formData.address);
-        formData.categories.forEach((cat) => payload.append("categories[]", cat));
-        if (formData.image) payload.append("image", formData.image);
-
-        // Call signup with FormData
-        const res = await signup(formData.role, payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        // Redirect after signup
-        navigate("/restaurant/dashboard", { replace: true });
-      } else if (formData.role === "user") {
-        payload = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-          gender: formData.gender,
-        };
-
-        const res = await signup(formData.role, payload);
-        navigate("/", { replace: true });
-      } else if (formData.role === "delivery") {
-        payload = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-        };
-
-        const res = await signup(formData.role, payload);
-        navigate("/delivery/dashboard", { replace: true });
+    try {
+      // ---------- FRONTEND VALIDATION ----------
+      if (
+        isSignup &&
+        formData.role === "restaurant" &&
+        formData.categories.length === 0
+      ) {
+        throw new Error("Please select at least one category");
       }
-    } 
-    // ---------- LOGIN ----------
-    else {
-      payload = {
-        email: formData.email,
-        password: formData.password,
-      };
 
-      await login(formData.role, payload);
+      let payload;
 
-      if (formData.role === "admin") navigate("/admin/dashboard", { replace: true });
-      else if (formData.role === "restaurant") navigate("/restaurant/dashboard", { replace: true });
-      else if (formData.role === "delivery") navigate("/delivery/dashboard", { replace: true });
-      else navigate("/", { replace: true });
+      // ---------- SIGNUP ----------
+      if (isSignup) {
+        if (formData.role === "restaurant") {
+          // Use FormData for restaurant signup (image upload)
+          payload = new FormData();
+          payload.append("restaurantId", formData.restaurantId);
+          payload.append("name", formData.name);
+          payload.append("email", formData.email);
+          payload.append("password", formData.password);
+          payload.append("phone", formData.phone);
+          payload.append("address", formData.address);
+          formData.categories.forEach((cat) =>
+            payload.append("categories[]", cat)
+          );
+          if (formData.image) payload.append("image", formData.image);
+
+          // Call signup with FormData
+          const res = await signup(formData.role, payload, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+
+          // Redirect after signup
+          navigate("/restaurant/dashboard", { replace: true });
+        } else if (formData.role === "user") {
+          payload = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            gender: formData.gender,
+          };
+
+          const res = await signup(formData.role, payload);
+          navigate("/", { replace: true });
+        } else if (formData.role === "delivery") {
+          payload = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          };
+
+          const res = await signup(formData.role, payload);
+          navigate("/delivery/dashboard", { replace: true });
+        }
+      }
+      // ---------- LOGIN ----------
+      else {
+        payload = {
+          email: formData.email,
+          password: formData.password,
+        };
+
+        await login(formData.role, payload);
+
+        if (formData.role === "admin")
+          navigate("/admin/dashboard", { replace: true });
+        else if (formData.role === "restaurant")
+          navigate("/restaurant/dashboard", { replace: true });
+        else if (formData.role === "delivery")
+          navigate("/delivery/dashboard", { replace: true });
+        else navigate("/", { replace: true });
+      }
+    } catch (err) {
+      // Handles backend messages and frontend validation errors
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.errors?.[0]?.msg ||
+          err.message ||
+          "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    // Handles backend messages and frontend validation errors
-    setError(
-      err.response?.data?.message ||
-      err.response?.data?.errors?.[0]?.msg ||
-      err.message ||
-      "Something went wrong"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -169,7 +172,7 @@ const Auth = () => {
                   key={role}
                   onClick={() => {
                     setFormData({ ...formData, role });
-                    if (role === "admin") setIsSignup(false);
+                    setIsSignup(false);
                     setStep("form");
                   }}
                   className="group w-full flex items-center justify-between px-5 py-4 border rounded-xl
@@ -206,6 +209,35 @@ const Auth = () => {
             {error && (
               <p className="text-red-500 text-sm text-center">{error}</p>
             )}
+
+            {/* Login / Signup Tabs */}
+            <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+              <button
+                type="button"
+                onClick={() => setIsSignup(false)}
+                className={`flex-1 py-2 text-sm font-medium rounded-md transition
+      ${
+        !isSignup
+          ? "bg-amber-500 text-white shadow"
+          : "text-gray-500 hover:text-gray-700 hover:cursor-pointer active:scale-95"
+      }`}
+              >
+                Login
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSignup(true)}
+                className={`flex-1 py-2 text-sm font-medium rounded-md transition
+      ${
+        isSignup
+          ? "bg-amber-500 text-white shadow"
+          : "text-gray-500 hover:text-gray-700 hover:cursor-pointer active:scale-95"
+      }`}
+              >
+                Register
+              </button>
+            </div>
 
             {/* heading */}
             <h2 className="text-2xl font-semibold text-center">
@@ -278,9 +310,7 @@ const Auth = () => {
                       onChange={handleChange}
                       className="w-full mt-1 px-4 py-2 border rounded-lg"
                     />
-                    <label className="text-sm font-medium">
-                      Logo
-                    </label>
+                    <label className="text-sm font-medium">Logo</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -412,18 +442,6 @@ const Auth = () => {
                 ? "Create Account"
                 : "Login"}
             </button>
-
-            {formData.role !== "admin" && (
-              <p className="text-center text-sm text-gray-600">
-                {isSignup ? "Already have an account?" : "New here?"}
-                <span
-                  onClick={() => setIsSignup(!isSignup)}
-                  className="ml-1 cursor-pointer text-amber-600 hover:underline"
-                >
-                  {isSignup ? "Login" : "Signup"}
-                </span>
-              </p>
-            )}
           </form>
         )}
       </div>

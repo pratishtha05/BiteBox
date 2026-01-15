@@ -61,19 +61,32 @@ const RestaurantMenu = () => {
               <p className="font-semibold mt-2">₹{item.price}</p>
             </div>
 
-            <button
-              onClick={() => handleAddToCart(item)}
-              disabled={!isAuthenticated || role !== "user"}
-              className={`mt-4 py-2 rounded transition
-                ${
-                  !isAuthenticated || role !== "user"
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-amber-500 text-white hover:bg-amber-600 hover:cursor-pointer active:scale-95"
-                }
-              `}
-            >
-              Add to Cart
-            </button>
+            <div className="relative group">
+              <button
+                onClick={() => handleAddToCart(item)}
+                disabled={!isAuthenticated || role !== "user"}
+                className={`mt-4 py-2 w-full rounded transition
+      ${
+        !isAuthenticated || role !== "user"
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-amber-500 text-white hover:bg-amber-600 hover:cursor-pointer active:scale-95"
+      }
+    `}
+              >
+                Add to Cart
+              </button>
+
+              {/* Tooltip */}
+              {!isAuthenticated || role !== "user" ? (
+                <span
+                  className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2
+                 whitespace-nowrap rounded-md bg-black px-3 py-1 text-xs text-white
+                 opacity-0 group-hover:opacity-100 transition"
+                >
+                  Please login to continue
+                </span>
+              ) : null}
+            </div>
           </div>
         ))}
       </div>

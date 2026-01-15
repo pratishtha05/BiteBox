@@ -196,9 +196,6 @@ router.post("/contact", async (req, res) => {
   }
 });
 
-// GET available categories based on active restaurants
-
-
 
 const Deal = require("../models/deal.model");
 
