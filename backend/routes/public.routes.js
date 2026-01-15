@@ -5,6 +5,39 @@ const MenuItem = require("../models/menu.model");
 const Contact = require("../models/contact.model");
 const transporter = require("../utils/mailer");
 
+router.get("/categories", async (req, res) => {
+  try {
+    const categories = await Restaurant.aggregate([
+      {
+        $match: { isBlocked: false }
+      },
+      {
+        $unwind: "$categories"
+      },
+      {
+        $group: {
+          _id: "$categories",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    res.json({
+      categories: categories.map(c => ({
+        id: c._id.replace(/\s+/g, "-"),
+        name: c._id,
+        count: c.count
+      }))
+    });
+  } catch (err) {
+    console.error("Category fetch error:", err);
+    res.status(500).json({ message: "Failed to fetch categories" });
+  }
+});
+
 router.get("/restaurants", async (req, res) => {
   try {
     const filter = { isBlocked: false };
@@ -162,6 +195,10 @@ router.post("/contact", async (req, res) => {
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
+
+// GET available categories based on active restaurants
+
+
 
 const Deal = require("../models/deal.model");
 

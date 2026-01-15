@@ -13,13 +13,18 @@ const Dashboard = () => {
 
   // ---------------- FETCH CATEGORIES ----------------
   useEffect(() => {
-    setCategories([
-      { id: "north-indian", name: "North Indian" },
-      { id: "south-indian", name: "South Indian" },
-      { id: "fast-food", name: "Fast Food" },
-      { id: "bakery", name: "Bakery" },
-    ]);
-  }, []);
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/public/categories");
+      setCategories(res.data.categories);
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    }
+  };
+
+  fetchCategories();
+}, []);
+
 
   // ---------------- FETCH RESTAURANTS ----------------
   useEffect(() => {
@@ -83,7 +88,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="flex gap-4 justify-around overflow-x-auto pb-2">
+        <div className="flex gap-4 overflow-x-auto pb-2">
           {categories.map((category) => {
             const isActive = selectedCategory === category.id;
 
