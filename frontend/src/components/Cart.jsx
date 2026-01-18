@@ -1,14 +1,11 @@
-import React from "react";
-import axios from "axios";
 import { X, Minus, Plus } from "lucide-react";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
+import { useCart } from "../context/CartContext";
 
 const Cart = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { cart, restaurantId, updateQty, removeItem } = useCart();
-  const { token } = useAuth();
 
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -34,18 +31,18 @@ const Cart = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Overlay */}
+  
       <div
         onClick={onClose}
         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 cursor-pointer transition-opacity duration-300"
       />
 
-      {/* Sidebar */}
+      
       <div
         className={`fixed top-0 right-0 h-full w-96 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-        {/* Header */}
+        
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">Your Cart</h2>
           <button
@@ -56,7 +53,7 @@ const Cart = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Cart Items */}
+        
         <div className="px-6 py-4 space-y-4 overflow-y-auto h-[calc(100%-190px)]">
           {cart.length === 0 && (
             <div className="flex flex-col items-center justify-center text-gray-400 h-full">
@@ -70,7 +67,7 @@ const Cart = ({ isOpen, onClose }) => {
               key={item.menuItem}
               className="flex gap-4 items-center bg-gray-50 rounded-2xl p-4 shadow-sm hover:shadow-md transition"
             >
-              {/* Optional Image */}
+             
               <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
                 {item.image ? (
                   <img
@@ -83,7 +80,7 @@ const Cart = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Item Info */}
+             
               <div className="flex-1 flex flex-col justify-between h-full">
                 <div>
                   <h4 className="font-medium text-gray-800 capitalize">
@@ -92,7 +89,7 @@ const Cart = ({ isOpen, onClose }) => {
                   <p className="text-sm text-gray-500 mt-1">₹{item.price}</p>
                 </div>
 
-                {/* Quantity Controls */}
+              
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center border rounded-lg overflow-hidden">
                     <button
@@ -121,7 +118,6 @@ const Cart = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Item Total Price */}
               <div className="font-semibold text-gray-800">
                 ₹{item.price * item.quantity}
               </div>
@@ -129,7 +125,6 @@ const Cart = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        {/* Footer */}
         {cart.length > 0 && (
           <div className="px-6 py-4 border-t bg-white sticky bottom-0">
             <div className="flex justify-between items-center mb-4">

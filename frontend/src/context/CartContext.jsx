@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
@@ -9,7 +10,6 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [restaurantId, setRestaurantId] = useState(null);
 
-  // Load cart from backend on login
   useEffect(() => {
     if (!isAuthenticated) return;
 

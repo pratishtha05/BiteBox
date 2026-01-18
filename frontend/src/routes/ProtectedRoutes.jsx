@@ -4,8 +4,7 @@ import { useAuth } from "../context/AuthContext";
 const ProtectedRoutes = ({ allowedRoles }) => {
   const { role, isAuthenticated, loading } = useAuth();
 
-  // Show nothing or a loader while auth is loading
-  if (loading) return null; // or <div>Loading...</div>
+  if (loading) return null; 
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) return <Navigate to="/auth" replace />;

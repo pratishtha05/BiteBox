@@ -10,11 +10,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
   const [admin, setAdmin] = useState(null);
-  const [delivery, setDelivery] = useState(null); // ✅ Delivery partner state
+  const [delivery, setDelivery] = useState(null); 
 
   const [loading, setLoading] = useState(true);
 
-  // ---------------- LOAD FROM LOCALSTORAGE ----------------
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedRole = localStorage.getItem("role");
@@ -54,13 +53,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // ---------------- LOGIN ----------------
   const login = async (role, payload) => {
     try {
       const res = await axios.post(`http://localhost:3000/auth/${role}/login`, payload);
       const { token, user, restaurant, admin, delivery } = res.data;
 
-      // Blocked checks
       if (role === "restaurant" && restaurant?.isBlocked) {
         throw new Error(`Restaurant is blocked: ${restaurant.blockReason}`);
       }
@@ -112,7 +109,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ---------------- LOGOUT ----------------
   const logout = () => {
     localStorage.clear();
     setToken(null);
@@ -123,13 +119,13 @@ export const AuthProvider = ({ children }) => {
     setDelivery(null);
   };
 
-  // ---------------- SIGNUP ----------------
+
   const signup = async (role, payload) => {
     if (role === "admin") throw new Error("Admin cannot signup");
 
     try {
       const res = await axios.post(`http://localhost:3000/auth/${role}/signup`, payload);
-      // Auto-login for restaurant
+
     if (role === "restaurant") {
       const loginPayload = {
         email: payload.get("email"),

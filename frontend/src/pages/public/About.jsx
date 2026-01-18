@@ -1,10 +1,9 @@
-// About.jsx
 import React from "react";
 
 const About = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-12">
-      {/* Hero Section */}
+      
       <section className="bg-amber-50 rounded-xl p-6 md:p-10 flex flex-col md:flex-row items-center gap-6">
         <div className="md:w-1/2 space-y-4">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -26,7 +25,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Mission & Vision */}
+     
       <section className="grid md:grid-cols-2 gap-6">
         <div className="bg-white shadow rounded-xl p-6 hover:shadow-lg transition">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Our Mission</h2>
@@ -42,7 +41,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="text-center">
         <p className="text-gray-700 mb-4">
           Hungry? Explore the best deals near you!

@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Deals = () => {
@@ -29,28 +28,24 @@ const Deals = () => {
       }
     };
 
-    fetchDeals(); // ✅ CALL FUNCTION
+    fetchDeals(); 
   }, []);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Title */}
+    
       <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">
         Explore Deals
       </h2>
 
-      {/* Loading */}
       {loading && <p className="text-gray-500">Loading deals...</p>}
 
-      {/* Error */}
       {!loading && error && <p className="text-red-500 font-medium">{error}</p>}
 
-      {/* Empty */}
       {!loading && !error && deals.length === 0 && (
         <p className="text-gray-500">No deals available right now</p>
       )}
 
-      {/* Deals */}
       {!loading && deals.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {deals.map((deal) => (

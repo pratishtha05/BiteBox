@@ -4,7 +4,7 @@ import {
   User,
   Store,
   Shield,
-  Truck, // lucide-react icon for delivery
+  Truck,
   ArrowLeft,
   Eye,
   EyeOff,
@@ -52,7 +52,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // ---------- FRONTEND VALIDATION ----------
       if (
         isSignup &&
         formData.role === "restaurant" &&
@@ -63,10 +62,8 @@ const Auth = () => {
 
       let payload;
 
-      // ---------- SIGNUP ----------
       if (isSignup) {
         if (formData.role === "restaurant") {
-          // Use FormData for restaurant signup (image upload)
           payload = new FormData();
           payload.append("restaurantId", formData.restaurantId);
           payload.append("name", formData.name);
@@ -79,12 +76,10 @@ const Auth = () => {
           );
           if (formData.image) payload.append("image", formData.image);
 
-          // Call signup with FormData
           const res = await signup(formData.role, payload, {
             headers: { "Content-Type": "multipart/form-data" },
           });
 
-          // Redirect after signup
           navigate("/restaurant/dashboard", { replace: true });
         } else if (formData.role === "user") {
           payload = {
@@ -109,7 +104,6 @@ const Auth = () => {
           navigate("/delivery/dashboard", { replace: true });
         }
       }
-      // ---------- LOGIN ----------
       else {
         payload = {
           email: formData.email,
@@ -127,7 +121,6 @@ const Auth = () => {
         else navigate("/", { replace: true });
       }
     } catch (err) {
-      // Handles backend messages and frontend validation errors
       setError(
         err.response?.data?.message ||
           err.response?.data?.errors?.[0]?.msg ||
@@ -142,7 +135,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transition-all">
-        {/* Step 1: Choose Role */}
+        {/* Choose Role */}
         {step === "role" && (
           <>
             <h1 className="text-3xl font-semibold text-center mb-2">
@@ -152,7 +145,6 @@ const Auth = () => {
               Choose how you want to continue
             </p>
 
-            {/* Role options */}
             <div className="space-y-4">
               {[
                 { role: "user", icon: <User />, label: "User" },
@@ -193,10 +185,10 @@ const Auth = () => {
           </>
         )}
 
-        {/* Step 2: Form */}
+        {/* Form */}
         {step === "form" && (
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* change role button */}
+            
             <button
               type="button"
               onClick={() => setStep("role")}
@@ -205,12 +197,10 @@ const Auth = () => {
               <ArrowLeft size={18} /> Change role
             </button>
 
-            {/* Error Messages */}
             {error && (
               <p className="text-red-500 text-sm text-center">{error}</p>
             )}
 
-            {/* Login / Signup Tabs */}
             <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
               <button
                 type="button"
@@ -239,12 +229,10 @@ const Auth = () => {
               </button>
             </div>
 
-            {/* heading */}
             <h2 className="text-2xl font-semibold text-center">
               {isSignup ? "Create Account" : "Login"}
             </h2>
 
-            {/* Signup-only fields */}
             {isSignup && formData.role !== "admin" && (
               <>
                 {(formData.role === "user" || formData.role === "delivery") && (

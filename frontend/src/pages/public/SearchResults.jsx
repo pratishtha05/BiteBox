@@ -61,7 +61,6 @@ const SearchResults = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-lg font-semibold text-gray-800">
           Search results for{" "}
@@ -80,7 +79,6 @@ const SearchResults = () => {
         <p className="text-gray-500">No results found</p>
       )}
 
-      {/* ================= RESTAURANTS ================= */}
       {restaurants.length > 0 && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -124,7 +122,6 @@ const SearchResults = () => {
         </>
       )}
 
-      {/* ================= FOOD ITEMS ================= */}
       {foods.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">

@@ -2,29 +2,32 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Layout from "./Layout";
 
-import ProtectedRoutes from "./routes/ProtectedRoutes";
 import Cart from "./components/Cart";
 
 import AdminRoutes from "./routes/AdminRoutes.jsx";
 import RestaurantRoutes from "./routes/RestaurantRoutes.jsx";
-import Orders from "./pages/Orders.jsx";
+import ProtectedRoutes from "./routes/ProtectedRoutes";
 import DeliveryRoutes from "./routes/DeliveryRoutes.jsx";
 import PublicRoutes from "./routes/PublicRoutes.jsx";
+
+import Orders from "./pages/user/Orders.jsx";
 import Settings from "./pages/Settings.jsx";
-import Confirmation from "./pages/Confirmation.jsx";
-import TrackOrder from "./pages/TrackOrder.jsx";
+import Confirmation from "./pages/user/Confirmation.jsx";
+import TrackOrder from "./pages/user/TrackOrder.jsx";
+import NotFound from "./pages/public/NotFound.jsx";
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* PUBLIC ROUTES */}
         <Route path="/*" element={<PublicRoutes />} />
 
-        {/* 🔐 PROTECTED USER ROUTES */}
+        {/* PROTECTED USER ROUTES */}
         <Route element={<ProtectedRoutes allowedRoles={["user"]} />}>
           <Route path="cart" element={<Cart />} />
         </Route>
+
         <Route element={<ProtectedRoutes allowedRoles={["user"]} />}>
           <Route
             path="orders"
@@ -50,6 +53,7 @@ const Router = () => {
           />
         </Route>
 
+        {/* PROTECTED ROUTES (only logged in users)*/}
         <Route
           element={
             <ProtectedRoutes allowedRoles={["user", "admin", "restaurant"]} />
@@ -73,6 +77,9 @@ const Router = () => {
 
         {/* Delivery Routes */}
         <Route path="/delivery/*" element={<DeliveryRoutes />} />
+
+        {/* Not Found Route */}
+        <Route path="/notFound" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

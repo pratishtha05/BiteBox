@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ShoppingCart, DollarSign, Menu, Star } from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext";
 
 const RestaurantDashboard = () => {
@@ -27,7 +28,6 @@ const RestaurantDashboard = () => {
 
         const data = res.data;
 
-        // Stats cards
         setStats([
           {
             id: 1,
@@ -50,7 +50,7 @@ const RestaurantDashboard = () => {
         ]);
 
         setRecentOrders(data.recentOrders || []);
-        setTopMenuItems(data.topMenuItems || []); // optional, can be empty
+        setTopMenuItems(data.topMenuItems || []); 
       } catch (err) {
         console.error(err);
       } finally {
@@ -63,7 +63,6 @@ const RestaurantDashboard = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-10">
-      {/* ---------------- Header ---------------- */}
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-gray-900">Welcome, {restaurant?.name}!</h1>
         <p className="text-gray-500 mt-1">
@@ -71,7 +70,6 @@ const RestaurantDashboard = () => {
         </p>
       </div>
 
-      {/* ---------------- Stats Cards ---------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {loading
           ? Array(3).fill(0).map((_, idx) => (
@@ -93,7 +91,6 @@ const RestaurantDashboard = () => {
             ))}
       </div>
 
-      {/* ---------------- Recent Orders ---------------- */}
       <div className="bg-white rounded-2xl shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Orders</h2>
         {loading ? (
@@ -129,7 +126,6 @@ const RestaurantDashboard = () => {
         )}
       </div>
 
-      {/* ---------------- Top Menu Items ---------------- */}
       {topMenuItems.length > 0 && (
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Top Menu Items</h2>

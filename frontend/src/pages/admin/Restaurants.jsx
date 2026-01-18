@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 import { ChevronDown } from "lucide-react";
+
+import { useAuth } from "../../context/AuthContext";
 
 const Restaurants = () => {
   const { token } = useAuth();
@@ -16,13 +17,11 @@ const Restaurants = () => {
     reason: "",
   });
 
-  /* ---------------- MESSAGE ---------------- */
   const showMessage = (text, type = "success", duration = 4000) => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), duration);
   };
 
-  /* ---------------- FETCH RESTAURANTS ---------------- */
   const fetchRestaurants = async () => {
     try {
       const res = await axios.get("http://localhost:3000/admin/restaurants", {
@@ -40,7 +39,6 @@ const Restaurants = () => {
     fetchRestaurants();
   }, []);
 
-  /* ---------------- BLOCK / UNBLOCK ---------------- */
   const handleBlockUnblock = async (id, action = "block") => {
     if (action === "block" && !blockModal.reason)
       return showMessage("Please provide a reason", "error");
@@ -88,7 +86,6 @@ const Restaurants = () => {
               key={restaurant._id}
               className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-lg transition-shadow"
             >
-              {/* ---------- ROW ---------- */}
               <div
                 className="flex justify-between items-center p-4 cursor-pointer"
                 onClick={() =>
@@ -121,7 +118,6 @@ const Restaurants = () => {
                   </span>
                 </div>
 
-                {/* ---------- ACTIONS ---------- */}
                 <div className="flex items-center gap-3">
                   {!restaurant.isBlocked ? (
                     <button
@@ -158,7 +154,6 @@ const Restaurants = () => {
                 </div>
               </div>
 
-              {/* ---------- EXPANDED DETAILS ---------- */}
               {isExpanded && (
                 <div className="p-4 bg-gray-50 border-t rounded-b-xl space-y-2">
                   <h3 className="font-semibold text-gray-700">
@@ -190,7 +185,6 @@ const Restaurants = () => {
         })}
       </div>
 
-      {/* ---------- BLOCK MODAL ---------- */}
       {blockModal.open && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div

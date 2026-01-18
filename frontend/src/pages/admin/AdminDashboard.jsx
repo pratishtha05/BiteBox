@@ -62,7 +62,6 @@ const AdminDashboard = () => {
   return (
     <div className="p-6 space-y-8">
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
         <StatCard
@@ -82,9 +81,8 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* Middle Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Attention Required */}
+
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-900 mb-4">
             Attention Required
@@ -117,7 +115,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activity */}
         <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <div className="rounded-lg bg-amber-50 p-1.5">

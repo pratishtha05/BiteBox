@@ -17,7 +17,7 @@ const DeliveryRoutes = () => {
       </Route>
 
       {/* redirect unmatched route */}
-      <Route path="*" element={<Navigate to="/auth" replace />} />
+      <Route path="*" element={<Navigate to="/notFound" replace />} />
     </Routes>
   );
 };

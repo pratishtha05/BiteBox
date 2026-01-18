@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Trash2, Edit, ImageIcon } from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext";
 
 const initialFormState = {
@@ -52,7 +53,7 @@ const Menu = () => {
         await axios.put(
           `http://localhost:3000/menu/${editingId}`,
           formData,
-          { headers } // DO NOT set content-type, browser will handle multipart
+          { headers } 
         );
       } else {
         await axios.post(
@@ -76,7 +77,7 @@ const Menu = () => {
       price: item.price,
       description: item.description || "",
       category: item.category || "",
-      image: null, // reset file input
+      image: null, 
       isAvailable: item.isAvailable,
     });
     setEditingId(item._id);
@@ -108,7 +109,6 @@ const Menu = () => {
     <div className="max-w-6xl mx-auto p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Manage Menu</h2>
 
-      {/* FORM */}
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-10 items-end"
@@ -156,7 +156,6 @@ const Menu = () => {
         </button>
       </form>
 
-      {/* MENU LIST */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
           <div
@@ -191,7 +190,6 @@ const Menu = () => {
               <p className="text-sm text-gray-400 mt-1">{item.description}</p>
             )}
 
-            {/* Actions */}
             <div className="flex gap-3 mt-4 items-center">
               <button
                 disabled={item.isDeleted}

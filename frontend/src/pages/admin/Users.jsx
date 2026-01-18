@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 import { ChevronDown } from "lucide-react";
+
+import { useAuth } from "../../context/AuthContext";
 
 const Users = () => {
   const { token } = useAuth();
@@ -13,13 +14,11 @@ const Users = () => {
   const [blockModal, setBlockModal] = useState({ open: false, userId: null, reason: "" });
   const [expandedUser, setExpandedUser] = useState(null);
 
-  // ---------------- MESSAGE ----------------
   const showMessage = (text, type = "success", duration = 4000) => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), duration);
   };
 
-  // ---------------- FETCH USERS ----------------
   const fetchUsers = async () => {
     try {
       const res = await axios.get("http://localhost:3000/admin/users", {
@@ -37,7 +36,6 @@ const Users = () => {
     fetchUsers();
   }, []);
 
-  // ---------------- BLOCK/UNBLOCK USER ----------------
   const handleBlockUnblockUser = async (userId, action = "block") => {
     let reason = blockModal.reason;
     if (action === "block" && !reason) return showMessage("Please provide a reason", "error");
@@ -56,7 +54,6 @@ const Users = () => {
     }
   };
 
-  // ---------------- VIEW ORDERS ----------------
   const handleViewOrders = async (userId) => {
     if (selectedOrders[userId]) {
       setSelectedOrders((prev) => ({ ...prev, [userId]: null }));
@@ -78,7 +75,6 @@ const Users = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
 
-      {/* ---------------- MESSAGE ---------------- */}
       {message.text && (
         <p
           className={`p-3 rounded-md transition-all text-center ${
@@ -89,7 +85,6 @@ const Users = () => {
         </p>
       )}
 
-      {/* ---------------- USERS LIST ---------------- */}
       <div className="space-y-4">
         {users.map((user) => {
           const isExpanded = expandedUser === user._id;
@@ -117,7 +112,7 @@ const Users = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {/* Buttons on the right */}
+      
                   {!user.isBlocked ? (
                     <button
                       onClick={(e) => {
@@ -150,7 +145,6 @@ const Users = () => {
                     {selectedOrders[user._id] ? "Hide Orders" : "View Orders"}
                   </button>
 
-                  {/* Arrow for expand/collapse */}
                   <ChevronDown
                     size={22}
                     className={`ml-2 text-gray-400 transition-transform duration-200 ${
@@ -160,7 +154,6 @@ const Users = () => {
                 </div>
               </div>
 
-              {/* ---------------- EXPANDED DETAILS ---------------- */}
               {isExpanded && (
                 <div className="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl transition-all">
                   <h3 className="font-semibold text-gray-700 mb-2">User Details</h3>
@@ -170,7 +163,6 @@ const Users = () => {
                   <p><strong>Gender:</strong> {user.gender}</p>
                   <p><strong>Status:</strong> {user.isBlocked ? `Blocked (${user.blockReason})` : "Active"}</p>
 
-                  {/* Order history */}
                   {selectedOrders[user._id] && (
                     <div className="mt-4">
                       <h4 className="font-semibold mb-2 text-gray-700">Order History</h4>
@@ -195,10 +187,9 @@ const Users = () => {
         })}
       </div>
 
-      {/* ---------------- BLOCK MODAL ---------------- */}
       {blockModal.open && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Blurred background */}
+      
           <div
             className="absolute inset-0 bg-opacity-0 backdrop-blur-sm"
             onClick={() => setBlockModal({ open: false, userId: null, reason: "" })}

@@ -1,4 +1,3 @@
-// Contact.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -26,7 +25,6 @@ const Contact = () => {
     }
   };
 
-  // Auto-hide message after 4 seconds
   useEffect(() => {
     if (status.visible) {
       const timer = setTimeout(() => setStatus((prev) => ({ ...prev, visible: false })), 4000);
@@ -36,7 +34,7 @@ const Contact = () => {
 
   return (
     <div className="p-6 mt-10 max-w-4xl mx-auto bg-gray-50 rounded-xl ">
-      {/* Page Heading */}
+      
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
         Get in Touch
       </h1>
@@ -44,7 +42,6 @@ const Contact = () => {
         Questions, feedback, or suggestions? Fill out the form below and our team will respond promptly.
       </p>
 
-      {/* Contact Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
@@ -81,7 +78,6 @@ const Contact = () => {
         </button>
       </form>
 
-      {/* Notification */}
       {status.visible && (
         <div
           className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 z-50 ${

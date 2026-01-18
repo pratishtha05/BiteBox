@@ -59,7 +59,7 @@ const AdminRoutes = () => {
       </Route>
 
       {/* redirect any unmatched route */}
-      <Route path="*" element={<Navigate to="/auth" replace />} />
+      <Route path="*" element={<Navigate to="/notFound" replace />} />
     </Routes>
   );
 };

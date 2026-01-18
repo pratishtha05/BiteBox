@@ -7,7 +7,8 @@ import {
   Clock,
   Truck,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+
+import { useAuth } from "../../context/AuthContext";
 
 const STATUS_FLOW = [
   { key: "placed", label: "Order Placed", icon: Package },
@@ -25,7 +26,6 @@ const TrackOrder = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔐 Protect route
   useEffect(() => {
     if (!token || role !== "user") {
       navigate("/auth", { replace: true });
@@ -48,12 +48,11 @@ const TrackOrder = () => {
     }
   };
 
-  // Initial fetch + polling
   useEffect(() => {
     if (!token) return;
 
     fetchOrder();
-    const interval = setInterval(fetchOrder, 10000); // refresh every 10s
+    const interval = setInterval(fetchOrder, 10000); 
 
     return () => clearInterval(interval);
   }, [orderId, token]);
@@ -74,7 +73,6 @@ const TrackOrder = () => {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">Track Order</h1>
 
-      {/* STATUS BAR */}
       <div className="bg-white p-6 rounded-2xl shadow">
         <div className="flex justify-between">
           {STATUS_FLOW.map((step, index) => {
@@ -98,7 +96,6 @@ const TrackOrder = () => {
         </div>
       </div>
 
-      {/* DELIVERY STATUS */}
       {order.deliveryPartner && (
         <div className="bg-white p-5 rounded-xl shadow">
           <p className="font-semibold mb-1">Delivery Status</p>
@@ -108,13 +105,12 @@ const TrackOrder = () => {
         </div>
       )}
 
-      {/* BILL */}
       <div className="bg-white p-6 rounded-2xl shadow">
         <h2 className="font-semibold mb-3">Bill</h2>
         {order.items.map((item) => (
           <div key={item.menuItem} className="flex justify-between text-sm mb-1">
             <span>
-              {item.name} × {item.quantity}
+              {item.name} * {item.quantity}
             </span>
             <span>₹{item.price * item.quantity}</span>
           </div>

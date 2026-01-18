@@ -11,7 +11,6 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  // ---------------- FETCH CATEGORIES ----------------
   useEffect(() => {
   const fetchCategories = async () => {
     try {
@@ -26,7 +25,6 @@ const Dashboard = () => {
 }, []);
 
 
-  // ---------------- FETCH RESTAURANTS ----------------
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
@@ -68,7 +66,6 @@ const Dashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* ---------------- CATEGORIES ---------------- */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold mb-6 capitalize text-gray-800">
@@ -123,7 +120,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ---------------- RESTAURANTS ---------------- */}
       {loading ? (
         <p className="text-gray-500">Loading restaurants...</p>
       ) : restaurants.length === 0 ? (
@@ -137,7 +133,7 @@ const Dashboard = () => {
               className="relative cursor-pointer rounded-2xl bg-white shadow-md overflow-hidden 
              transition-transform hover:scale-[1.01] hover:shadow-lg"
             >
-              {/* Restaurant Image */}
+    
               <div className="h-40 bg-amber-50 overflow-hidden flex items-center justify-center">
                 {restaurant.image ? (
                   <img
@@ -146,7 +142,7 @@ const Dashboard = () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.style.display = "none"; // fallback to icon
+                      e.target.style.display = "none";
                     }}
                   />
                 ) : (
@@ -156,14 +152,6 @@ const Dashboard = () => {
                 )}
               </div>
 
-              {/* Category Badge */}
-              {/* {restaurant.categories?.[0] && (
-                <span className="absolute top-3 right-3 text-xs px-3 py-1 rounded-full bg-amber-500 text-white font-semibold shadow-md">
-                  {restaurant.categories[0]}
-                </span>
-              )} */}
-
-              {/* Restaurant Details */}
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {restaurant.name}

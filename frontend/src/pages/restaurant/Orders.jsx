@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthContext";
 
 const STATUS_COLORS = {
   placed: "bg-gray-100 text-gray-800",
@@ -134,7 +135,7 @@ const Orders = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
         <button
@@ -145,12 +146,10 @@ const Orders = () => {
         </button>
       </div>
 
-      {/* Date Sections */}
       {visibleDates.map((date) => {
         const dayOrders = groupedOrders[date] || [];
         return (
           <div key={date} className="bg-white rounded-xl shadow-md overflow-hidden">
-            {/* Date Header */}
             <button
               onClick={() =>
                 setOpenDates((p) => ({ ...p, [date]: !p[date] }))
@@ -166,7 +165,6 @@ const Orders = () => {
               {openDates[date] ? <ChevronUp /> : <ChevronDown />}
             </button>
 
-            {/* Orders */}
             {openDates[date] && (
               <div className="p-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3 transition-all duration-300">
                 {dayOrders.length === 0 && (
@@ -194,16 +192,14 @@ const Orders = () => {
                       </span>
                     </div>
 
-                    {/* Items */}
                     <div className="text-sm text-gray-700">
                       {order.items.map((i) => (
                         <p key={i.menuItem}>
-                          {i.name} × {i.quantity}
+                          {i.name} * {i.quantity}
                         </p>
                       ))}
                     </div>
 
-                    {/* Delivery */}
                     {!order.deliveryPartner ? (
                       <select
                         onChange={(e) =>
@@ -234,7 +230,6 @@ const Orders = () => {
                       </div>
                     )}
 
-                    {/* Status */}
                     {getNextStatus(order.status) && (
                       <button
                         disabled={updating === order._id}

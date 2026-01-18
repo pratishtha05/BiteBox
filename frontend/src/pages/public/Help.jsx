@@ -1,4 +1,3 @@
-// Help.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { MessageSquare, HelpCircle, Info } from "lucide-react";
@@ -12,7 +11,7 @@ const Help = () => {
 
   return (
     <div className="p-6 rounded-xl ">
-      {/* Heading */}
+      
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">
         Need Help?
       </h1>
@@ -20,7 +19,7 @@ const Help = () => {
         Choose one of the options below to quickly find answers or get in touch with our team.
       </p>
 
-      {/* Help Sections */}
+      
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
         {sections.map((sec, idx) => (
           <Link

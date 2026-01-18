@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
-import { CheckCircle, Loader2, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthContext";
 
 const DeliveryPartners = () => {
   const { token } = useAuth();

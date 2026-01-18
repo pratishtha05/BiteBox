@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, ShoppingCart, User } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -7,7 +7,7 @@ import Cart from "./Cart";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { role, user, restaurant, admin, delivery, logout } = useAuth(); // added delivery
+  const { role, user, restaurant, admin, delivery, logout } = useAuth(); 
   const { cart } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +21,6 @@ const Navbar = () => {
     }, 0);
   };
 
-  // Display name based on role
   let displayName = "Guest";
   if (role === "user" && user?.name) displayName = user.name;
   else if (role === "restaurant" && restaurant?.name)
@@ -36,7 +35,6 @@ const Navbar = () => {
           Hello, <span className="text-amber-500">{displayName}</span>
         </h1>
 
-        {/* Search */}
         <form
           onSubmit={(e) => {
             e.preventDefault();

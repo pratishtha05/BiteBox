@@ -12,12 +12,12 @@ import {
   HelpCircle,
   MessageSquare,
 } from "lucide-react";
+
 import { useAuth } from "../context/AuthContext";
 
 const Sidebar = () => {
   const { role } = useAuth();
 
-  // Public nav
   const publicNav = [
     { name: "Home", path: "/", icon: Home },
     { name: "Deals", path: "/deals", icon: Heart },
@@ -26,7 +26,6 @@ const Sidebar = () => {
     { name: "Contact Us", path: "/contact", icon: MessageSquare },
   ];
 
-  // User nav
   const userNav = [
     { name: "Home", path: "/", icon: Home },
     { name: "My Orders", path: "/orders", icon: History },
@@ -35,7 +34,6 @@ const Sidebar = () => {
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
-  // Restaurant nav
   const restaurantNav = [
     { name: "Home", path: "/", icon: Home },
     {
@@ -53,7 +51,6 @@ const Sidebar = () => {
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
-  // Admin nav
   const adminNav = [
     { name: "Home", path: "/", icon: Home },
     {
@@ -72,19 +69,17 @@ const Sidebar = () => {
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
-  // Delivery Partner nav
   const deliveryNav = [
     { name: "Dashboard", path: "/delivery/dashboard", icon: LayoutDashboard },
     { name: "My Orders", path: "/delivery/orders", icon: History },
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
-  // Pick nav items based on role
   let navItems = publicNav;
   if (role === "user") navItems = userNav;
   if (role === "restaurant") navItems = restaurantNav;
   if (role === "admin") navItems = adminNav;
-  if (role === "delivery") navItems = deliveryNav; // delivery partner
+  if (role === "delivery") navItems = deliveryNav; 
 
   return (
     <div className="w-56 h-screen bg-white flex flex-col justify-between p-4 shadow-xl">

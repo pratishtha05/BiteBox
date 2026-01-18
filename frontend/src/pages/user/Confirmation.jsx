@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { CheckCircle } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { useCart } from "../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const Confirmation = () => {
   const navigate = useNavigate();
@@ -17,21 +17,18 @@ const Confirmation = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔒 Auth guard
   useEffect(() => {
     if (!token || role !== "user") {
       navigate("/auth", { replace: true });
     }
   }, [token, role, navigate]);
 
-  // ❌ Prevent direct access
   useEffect(() => {
     if (!items || !items.length) {
       navigate("/", { replace: true });
     }
   }, [items, navigate]);
 
-  // ✅ Create order ONLY here
   const handleConfirmOrder = async () => {
     try {
       setLoading(true);
@@ -153,7 +150,7 @@ const Confirmation = () => {
                   className="flex justify-between text-sm"
                 >
                   <span>
-                    {item.name} × {item.quantity}
+                    {item.name} * {item.quantity}
                   </span>
                   <span>₹{item.price * item.quantity}</span>
                 </div>

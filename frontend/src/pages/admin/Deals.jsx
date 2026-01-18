@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 import { Pencil, Trash2, Plus, X, ChevronDown } from "lucide-react";
+
+import { useAuth } from "../../context/AuthContext";
 
 const Deals = () => {
   const { token } = useAuth();
@@ -20,19 +21,16 @@ const Deals = () => {
     validTill: "",
   });
 
-  /* ---------------- MESSAGE ---------------- */
   const showMessage = (text, type = "success") => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), 4000);
   };
 
-  /* ---------------- API ---------------- */
   const api = axios.create({
     baseURL: "http://localhost:3000",
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  /* ---------------- FETCH DEALS ---------------- */
   const fetchDeals = async () => {
     try {
       const res = await api.get("/admin/deals");
@@ -48,7 +46,6 @@ const Deals = () => {
     fetchDeals();
   }, []);
 
-  /* ---------------- CREATE ---------------- */
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
@@ -67,7 +64,7 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- UPDATE ---------------- */
+
   const handleUpdate = async () => {
     try {
       await api.put(`/admin/deals/${editDeal._id}`, editDeal);
@@ -79,7 +76,7 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- TOGGLE ACTIVE ---------------- */
+
   const toggleStatus = async (deal) => {
     try {
       await api.put(`/admin/deals/${deal._id}`, {
@@ -91,7 +88,6 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- DELETE ---------------- */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this deal?")) return;
     try {
@@ -108,7 +104,6 @@ const Deals = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {/* ---------------- MESSAGE ---------------- */}
       {message.text && (
         <p
           className={`p-3 rounded-md text-center ${
@@ -121,7 +116,6 @@ const Deals = () => {
         </p>
       )}
 
-      {/* ---------------- CREATE DEAL ---------------- */}
       <form
         onSubmit={handleCreate}
         className="bg-white p-6 rounded-xl shadow grid grid-cols-1 md:grid-cols-5 gap-4"
@@ -150,7 +144,6 @@ const Deals = () => {
         </button>
       </form>
 
-      {/* ---------------- DEAL LIST ---------------- */}
       <div className="space-y-4">
         {deals.map((deal) => {
           const expanded = expandedDeal === deal._id;
@@ -225,7 +218,6 @@ const Deals = () => {
         })}
       </div>
 
-      {/* ---------------- EDIT MODAL ---------------- */}
       {editDeal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md relative space-y-4">

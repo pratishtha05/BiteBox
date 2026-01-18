@@ -1,4 +1,3 @@
-// FAQ.jsx
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -15,12 +14,11 @@ const FAQ = () => {
 
   return (
     <div className="p-6">
-      {/* Page Heading */}
+    
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-6">
         Frequently Asked Questions
       </h1>
 
-      {/* FAQ List */}
       <div className="space-y-4">
         {faqs.map((faq, idx) => (
           <div
