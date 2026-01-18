@@ -1,6 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+
 const Restaurant = require("../models/restaurant.model");
+
 const auth = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload");
 
@@ -13,7 +15,7 @@ const getFullImageUrl = (imagePath) => {
   return `http://localhost:3000${imagePath}`;
 };
 
-// ---------------- GET RESTAURANT PROFILE ----------------
+// Get Restaurant Profile
 router.get("/me", auth, async (req, res) => {
   try {
     if (req.auth.role !== "restaurant")
@@ -27,7 +29,6 @@ router.get("/me", auth, async (req, res) => {
         .status(403)
         .json({ message: `Account blocked: ${restaurant.blockReason}` });
 
-    // Add full URL for frontend
     const restaurantData = restaurant.toObject();
     restaurantData.image = getFullImageUrl(restaurantData.image);
 
@@ -38,7 +39,7 @@ router.get("/me", auth, async (req, res) => {
   }
 });
 
-// ---------------- UPLOAD PROFILE IMAGE ----------------
+// Upload Restaurant Image
 router.put(
   "/upload-image",
   auth,
@@ -62,7 +63,7 @@ router.put(
   }
 );
 
-// ---------------- UPDATE PROFILE ----------------
+// Update Restaurant Profile
 router.put("/update", auth, async (req, res) => {
   try {
     if (req.auth.role !== "restaurant")
@@ -93,7 +94,7 @@ router.put("/update", auth, async (req, res) => {
   }
 });
 
-// ---------------- CHANGE PASSWORD ----------------
+// Change Password
 router.put("/change-password", auth, async (req, res) => {
   try {
     if (req.auth.role !== "restaurant")
@@ -122,7 +123,7 @@ router.put("/change-password", auth, async (req, res) => {
   }
 });
 
-// ---------------- DELETE ACCOUNT ----------------
+// Delete Account
 router.delete("/delete", auth, async (req, res) => {
   try {
     if (req.auth.role !== "restaurant")

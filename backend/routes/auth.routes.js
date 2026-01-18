@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 
-// Models
 const User = require("../models/user.model");
 const Restaurant = require("../models/restaurant.model");
 const Admin = require("../models/admin.model");
@@ -12,7 +11,6 @@ const DeliveryPartner = require("../models/deliveryPartner.model");
 
 const upload = require("../middlewares/upload");  
 
-// Environment variable for JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // User Signup
@@ -149,7 +147,7 @@ router.post(
 // Restaurant Login
 router.post(
   "/restaurant/login",
-  express.json(), // Important: make sure JSON body parser is used
+  express.json(), 
   async (req, res) => {
     try {
       const { email, password } = req.body;

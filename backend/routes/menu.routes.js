@@ -1,15 +1,11 @@
 const express = require("express");
-const MenuItem = require("../models/menu.model");
+const router = express.Router();
+
 const auth = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload");
 
-const router = express.Router();
+const MenuItem = require("../models/menu.model");
 
-/**
- * =========================
- * RESTAURANT (PRIVATE)
- * =========================
- */
 
 // GET logged-in restaurant menu
 router.get("/", auth, async (req, res) => {
@@ -78,11 +74,6 @@ router.delete("/:id", auth, async (req, res) => {
   res.json({ message: "Menu item removed" });
 });
 
-/**
- * =========================
- * PUBLIC MENU (CUSTOMERS)
- * =========================
- */
 
 // GET menu for a specific restaurant
 router.get("/restaurant/:restaurantId", async (req, res) => {

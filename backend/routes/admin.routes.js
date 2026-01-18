@@ -1,17 +1,16 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const router = express.Router();
+
 const auth = require("../middlewares/auth.middleware");
 
 const Admin = require("../models/admin.model");
 const User = require("../models/user.model");
-const Order = require("../models/order.model"); // Order model
+const Order = require("../models/order.model"); 
 const Restaurant = require("../models/restaurant.model");
 const Deal = require("../models/deal.model");
 
 
-const router = express.Router();
-
-/* ---------------- ADMIN PROFILE ---------------- */
 router.get("/me", auth, async (req, res) => {
   if (req.auth.role !== "admin") return res.status(403).json({ message: "Forbidden" });
 
@@ -54,9 +53,8 @@ router.delete("/delete", auth, async (req, res) => {
   res.json({ message: "Admin account deleted" });
 });
 
-/* ---------------- USER MANAGEMENT ---------------- */
 
-// Get all users (include isBlocked & blockReason automatically)
+// Get all users
 router.get("/users", auth, async (req, res) => {
   if (req.auth.role !== "admin") return res.status(403).json({ message: "Forbidden" });
 
@@ -74,8 +72,8 @@ router.put("/users/:id/block", auth, async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.isBlocked = true;          // <-- required change for new field
-  user.blockReason = reason;       // <-- required change for new field
+  user.isBlocked = true;         
+  user.blockReason = reason;       
   await user.save();
 
   res.json({ message: "User blocked successfully" });
@@ -88,8 +86,8 @@ router.put("/users/:id/unblock", auth, async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.isBlocked = false;          // <-- required change for new field
-  user.blockReason = "";            // <-- required change for new field
+  user.isBlocked = false;       
+  user.blockReason = "";            
   await user.save();
 
   res.json({ message: "User unblocked successfully" });
@@ -106,7 +104,6 @@ router.get("/users/:id/orders", auth, async (req, res) => {
   res.json(orders);
 });
 
-// restaurant management 
 // Get all restaurants
 router.get("/restaurants", auth, async (req, res) => {
   if (req.auth.role !== "admin")
@@ -152,7 +149,7 @@ router.put("/restaurants/:id/unblock", auth, async (req, res) => {
   res.json({ message: "Restaurant unblocked successfully" });
 });
 
-/* ---------------- ADMIN DASHBOARD STATS ---------------- */
+
 router.get("/dashboard", auth, async (req, res) => {
   try {
     if (req.auth.role !== "admin") {
@@ -171,7 +168,6 @@ router.get("/dashboard", auth, async (req, res) => {
       Restaurant.countDocuments({ isBlocked: true }),
     ]);
 
-    // Optional: simple recent activity (last 5 users & restaurants)
     const recentUsers = await User.find()
       .sort({ _id: -1 })
       .limit(3)
@@ -200,7 +196,6 @@ router.get("/dashboard", auth, async (req, res) => {
   }
 });
 
-/* ---------------- CREATE DEAL ---------------- */
 router.post("/deals", auth, async (req, res) => {
   if (req.auth.role !== "admin")
     return res.status(403).json({ message: "Forbidden" });
@@ -209,7 +204,7 @@ router.post("/deals", auth, async (req, res) => {
   res.status(201).json(deal);
 });
 
-/* ---------------- GET ALL DEALS ---------------- */
+
 router.get("/admin/deals", auth, async (req, res) => {
   if (req.auth.role !== "admin")
     return res.status(403).json({ message: "Forbidden" });
@@ -226,7 +221,6 @@ router.get("/admin/deals", auth, async (req, res) => {
 });
 
 
-/* ---------------- UPDATE DEAL ---------------- */
 router.put("/deals/:id", auth, async (req, res) => {
   if (req.auth.role !== "admin")
     return res.status(403).json({ message: "Forbidden" });
@@ -240,7 +234,6 @@ router.put("/deals/:id", auth, async (req, res) => {
   res.json(deal);
 });
 
-/* ---------------- DELETE DEAL ---------------- */
 router.delete("/deals/:id", auth, async (req, res) => {
   if (req.auth.role !== "admin")
     return res.status(403).json({ message: "Forbidden" });

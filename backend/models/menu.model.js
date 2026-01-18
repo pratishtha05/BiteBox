@@ -20,7 +20,7 @@ const menuItemSchema = new mongoose.Schema(
     },
 
     category: {
-      type: String, // e.g. Burgers, Drinks
+      type: String, 
       default: "General",
     },  
 
@@ -35,7 +35,7 @@ const menuItemSchema = new mongoose.Schema(
     },
 
     isDeleted: {
-      type: Boolean, // IMPORTANT for orders
+      type: Boolean,
       default: false,
     },
 

@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
+
 const Restaurant = require("../models/restaurant.model");
 const MenuItem = require("../models/menu.model");
 const Contact = require("../models/contact.model");
+const Deal = require("../models/deal.model");
+
 const transporter = require("../utils/mailer");
 
 router.get("/categories", async (req, res) => {
@@ -71,32 +74,27 @@ router.get("/search", async (req, res) => {
       });
     }
 
-    /* 1️⃣ Restaurants by name */
     const restaurantsByName = await Restaurant.find({
       isBlocked: false,
       name: { $regex: query, $options: "i" },
     });
 
-    /* 2️⃣ Restaurants by category */
     const restaurantsByCategory = await Restaurant.find({
       isBlocked: false,
       categories: { $regex: query, $options: "i" },
     });
 
-    /* 3️⃣ Food items */
     const foods = await MenuItem.find({
       name: { $regex: query, $options: "i" },
       isAvailable: true,
       isDeleted: false,
     }).populate("restaurant", "name image categories");
 
-    /* 4️⃣ Merge restaurants (remove duplicates) */
     const restaurantMap = new Map();
     [...restaurantsByName, ...restaurantsByCategory].forEach((r) =>
       restaurantMap.set(r._id.toString(), r)
     );
 
-    /* 5️⃣ Unique category matches */
     const categories = [...new Set(
       restaurantsByCategory.flatMap(r => r.categories)
     )].filter(cat => cat.toLowerCase().includes(query));
@@ -112,12 +110,10 @@ router.get("/search", async (req, res) => {
   }
 });
 
-
-/* ---------------- PUBLIC DEALS ---------------- */
+// Public Deals
 router.get("/deals", async (req, res) => {
   const now = new Date();
 
-  // 🔴 Auto-expire outdated deals
   await Deal.updateMany(
     {
       isActive: true,
@@ -128,7 +124,6 @@ router.get("/deals", async (req, res) => {
     }
   );
 
-  // ✅ Fetch only active + valid deals
   const deals = await Deal.find({
     isActive: true,
     $or: [{ validTill: null }, { validTill: { $gte: now } }],
@@ -137,9 +132,7 @@ router.get("/deals", async (req, res) => {
   res.json(deals);
 });
 
-/**
- * GET menu for users
- */
+// Get Menu for users
 router.get("/:restaurantId", async (req, res) => {
   const items = await MenuItem.find({
     restaurant: req.params.restaurantId,
@@ -150,6 +143,7 @@ router.get("/:restaurantId", async (req, res) => {
   res.json(items);
 });
 
+// Contact Form Submission
 router.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -158,10 +152,8 @@ router.post("/contact", async (req, res) => {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    // 1️⃣ Save to DB
     const newContact = await Contact.create({ name, email, message });
 
-    // 2️⃣ Email to Admin
     await transporter.sendMail({
       from: `"Contact Form" <${process.env.ADMIN_EMAIL}>`,
       to: process.env.ADMIN_EMAIL,
@@ -174,7 +166,6 @@ router.post("/contact", async (req, res) => {
       `,
     });
 
-    // 3️⃣ Thank-you Email to User
     await transporter.sendMail({
       from: `"Support Team" <${process.env.ADMIN_EMAIL}>`,
       to: email,
@@ -196,7 +187,5 @@ router.post("/contact", async (req, res) => {
   }
 });
 
-
-const Deal = require("../models/deal.model");
 
 module.exports = router;

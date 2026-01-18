@@ -1,14 +1,11 @@
 const express = require("express");
 const router = express.Router();
+
 const Order = require("../models/order.model");
-const auth = require("../middlewares/auth.middleware");
 const MenuItem = require("../models/menu.model");
 
-/**
- * =========================
- * CREATE ORDER (USER)
- * =========================
- */
+const auth = require("../middlewares/auth.middleware");
+
 router.post("/create", auth, async (req, res) => {
   try {
     if (req.auth.role !== "user") {
@@ -17,7 +14,6 @@ router.post("/create", auth, async (req, res) => {
 
     const { restaurantId, items, totalAmount } = req.body;
 
-    // 🔥 Fetch menu items to snapshot data
     const menuItems = await MenuItem.find({
       _id: { $in: items.map(i => i.menuItem) }
     });
@@ -31,7 +27,7 @@ router.post("/create", auth, async (req, res) => {
         menuItem: item.menuItem,
         name: menu.name,
         price: menu.price,
-        image: menu.image, // ✅ snapshot image
+        image: menu.image, 
         quantity: item.quantity,
       };
     });
@@ -50,10 +46,6 @@ router.post("/create", auth, async (req, res) => {
   }
 });
 
-
-/**
- * USER ORDERS
- */
 router.get("/my-orders", auth, async (req, res) => {
   try {
     if (req.auth.role !== "user") {
@@ -70,15 +62,6 @@ router.get("/my-orders", auth, async (req, res) => {
   }
 });
 
-
-
-
-
-/**
- * =========================
- * RESTAURANT ORDERS
- * =========================
- */
 router.get("/restaurant", auth, async (req, res) => {
   try {
     if (req.auth.role !== "restaurant") {
@@ -97,9 +80,7 @@ router.get("/restaurant", auth, async (req, res) => {
   }
 });
 
-/**
- * GET SINGLE ORDER (USED BY CONFIRMATION / TRACK)
- */
+
 router.get("/:orderId", auth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId)
@@ -109,7 +90,6 @@ router.get("/:orderId", auth, async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // User can only see their own orders
     if (
       req.auth.role === "user" &&
       order.customer.toString() !== req.auth.id
@@ -123,12 +103,6 @@ router.get("/:orderId", auth, async (req, res) => {
   }
 });
 
-
-/**
- * =========================
- * UPDATE ORDER STATUS
- * =========================
- */
 router.put("/:orderId/status", auth, async (req, res) => {
   if (req.auth.role !== "restaurant") {
     return res.status(403).json({ message: "Forbidden" });
@@ -147,14 +121,12 @@ router.put("/:orderId/status", auth, async (req, res) => {
     return res.status(404).json({ message: "Order not found" });
   }
 
-  // Lock completed / cancelled orders
   if (["completed", "cancelled"].includes(order.status)) {
     return res
       .status(400)
       .json({ message: "Order status can no longer be updated" });
   }
 
-  // Cancel allowed anytime before completion
   if (status === "cancelled") {
     order.status = "cancelled";
     await order.save();
@@ -175,7 +147,6 @@ router.put("/:orderId/status", auth, async (req, res) => {
 
   res.json(order);
 });
-
 
 router.put("/:orderId/assign-delivery", auth, async (req, res) => {
   if (req.auth.role !== "restaurant") {

@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
+
 const Cart = require("../models/cart.model");
+
 const auth = require("../middlewares/auth.middleware");
 
 
-// GET: Get user cart
 router.get("/", auth, async (req, res) => {
   if (req.auth.role !== "user") return res.status(403).json({ message: "Forbidden" });
 
@@ -19,7 +20,6 @@ router.post("/", auth, async (req, res) => {
   try {
     const { items, restaurantId } = req.body;
 
-    // Ensure all items have name, price, quantity, image
     const preparedItems = items.map(item => ({
       menuItem: item.menuItem,
       name: item.name,
@@ -31,7 +31,7 @@ router.post("/", auth, async (req, res) => {
     const cart = await Cart.findOneAndUpdate(
       { user: req.auth.id },
       { items: preparedItems, restaurantId },
-      { new: true, upsert: true } // avoids VersionError
+      { new: true, upsert: true } 
     );
 
     res.json(cart);
