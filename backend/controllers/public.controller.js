@@ -64,10 +64,14 @@ exports.getRestaurants = async (req, res, next) => {
 
 // Helper to attach full image URL
 const attachImageUrl = (item) => {
-  const obj = item.toObject();
-  obj.image = obj.image
-    ? `${process.env.SERVER_URL}${obj.image}`
-    : "";
+  if (!item) return item;
+
+  const obj = typeof item.toObject === "function" ? item.toObject() : { ...item };
+
+  if (obj.image && !obj.image.startsWith('http')) {
+    obj.image = `${process.env.SERVER_URL}${obj.image}`;
+  }
+  
   return obj;
 };
 

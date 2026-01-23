@@ -15,6 +15,8 @@ import Settings from "./pages/Settings.jsx";
 import Confirmation from "./pages/user/Confirmation.jsx";
 import TrackOrder from "./pages/user/TrackOrder.jsx";
 import NotFound from "./pages/public/NotFound.jsx";
+import Favourites from "./pages/user/Favourites.jsx";
+import Messages from "./pages/user/Messages.jsx";
 
 const Router = () => {
   return (
@@ -48,6 +50,22 @@ const Router = () => {
             element={
               <Layout>
                 <TrackOrder />
+              </Layout>
+            }
+          />
+          <Route
+            path="/favourites"
+            element={
+              <Layout>
+                <Favourites />
+              </Layout>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <Layout>
+                <Messages />
               </Layout>
             }
           />

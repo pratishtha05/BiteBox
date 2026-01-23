@@ -30,8 +30,12 @@ const PUBLIC_NAV = [
 const USER_NAV = [
   { label: "Home", path: "/", icon: Home },
   { label: "My Orders", path: "/orders", icon: History },
-  { label: "Favorites", path: "/favorites", icon: Heart },
+  { label: "Favorites", path: "/favourites", icon: Heart },
   { label: "Messages", path: "/messages", icon: MessageSquare },
+  { label: "Deals", path: "/deals", icon: Heart },
+  { label: "About Us", path: "/about", icon: Info },
+  { label: "FAQs", path: "/faqs", icon: HelpCircle },
+  { label: "Contact Us", path: "/contact", icon: MessageSquare },
   { label: "Settings", path: "/settings", icon: Settings },
 ];
 

@@ -1,14 +1,11 @@
 import { useMemo, useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Search, LogOut, User as UserIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import Cart from "./Cart";
 
-/* =========================
-   Navbar Component
-========================= */
 const Navbar = () => {
   const navigate = useNavigate();
   const { role, user, restaurant, admin, delivery, logout } = useAuth();
@@ -17,9 +14,6 @@ const Navbar = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  /* =========================
-     Derived Values
-  ========================= */
   const cartCount = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity, 0),
     [cart]
@@ -33,9 +27,6 @@ const Navbar = () => {
     return "Guest";
   }, [role, user, restaurant, admin, delivery]);
 
-  /* =========================
-     Handlers
-  ========================= */
   const handleLogout = () => {
     logout();
     navigate("/", { replace: true });
@@ -44,86 +35,92 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-
     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     setSearchQuery("");
   };
 
-  /* =========================
-     Render
-  ========================= */
   return (
-    <header className="w-full bg-white border-b border-gray-100 px-6 py-3 shadow-sm">
-      <div className="flex items-center justify-between gap-6">
-        {/* Greeting */}
-        <h1 className="text-2xl font-bold text-gray-800 whitespace-nowrap">
-          Hello, <span className="text-amber-500">{displayName}</span>
-        </h1>
+    <header className="w-full bg-white/80 backdrop-blur-md top-0 z-50 shadow-sm px-4 md:px-12 py-3 transition-all">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 md:gap-8">
+        
+        {/* Branding/Greeting */}
+        <div className="flex items-baseline gap-2 shrink-0">
+          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+            Hello, <span className="text-amber-500">{displayName}</span>
+          </h1>
+        </div>
 
-        {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="flex items-center max-w-lg w-full bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm"
+          className="hidden md:flex flex-1 items-center max-w-lg relative group"
         >
+          <div className="absolute left-4 text-slate-400 group-focus-within:text-amber-500 transition-colors">
+            <Search size={18} />
+          </div>
           <input
             type="text"
-            placeholder="Search food or restaurants"
+            placeholder="What are you craving?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 outline-none text-sm text-gray-700 bg-transparent"
+            className="w-full bg-slate-100 border-none rounded-3xl py-4 pl-11 pr-24 text-sm focus:ring-2 focus:ring-amber-500/20 focus:bg-white outline-none transition-all"
           />
           <button
             type="submit"
-            className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm
-              hover:bg-amber-600 active:scale-95 transition"
+            className="absolute right-1.5 bg-amber-500 text-white px-4 py-3 rounded-3xl text-xs font-bold uppercase tracking-widest hover:bg-amber-600 active:scale-95 transition-all shadow-sm hover:cursor-pointer"
           >
             Search
           </button>
         </form>
 
-        {/* Actions */}
-        <div className="flex items-center gap-5">
+        {/* Actions Section */}
+        <div className="flex items-center gap-3 md:gap-5">
           {role === "user" && (
-            <>
+            <div className="relative">
               <button
                 onClick={() => setCartOpen(true)}
-                title="Cart"
-                className="relative flex items-center justify-center w-10 h-10 rounded-full
-                  text-gray-600 hover:text-amber-500 active:scale-95 transition"
+                className="group p-2.5 text-slate-600 hover:text-amber-600 transition-all active:scale-90 hover:cursor-pointer"
               >
-                <ShoppingCart size={22} />
+                <ShoppingCart size={22} strokeWidth={2.5} />
                 {cartCount > 0 && (
-                  <span
-                    className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center
-                      text-xs bg-red-500 text-white rounded-full font-semibold shadow-sm"
-                  >
+                  <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] bg-amber-500 text-white rounded-full font-black ring-4 ring-white animate-in zoom-in">
                     {cartCount}
                   </span>
                 )}
               </button>
-
-              <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-            </>
+              {/* <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} /> */}
+            </div>
           )}
 
           {!role ? (
             <Link to="/auth">
-              <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm
-                hover:bg-amber-600 active:scale-95 transition">
-                Login / Signup
+              <button className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-3xl text-sm font-bold hover:bg-amber-600 transition-all active:scale-95 hover:cursor-pointer">
+                <UserIcon size={18} />
+                <span>Sign In</span>
               </button>
             </Link>
           ) : (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm
-                hover:bg-red-600 active:scale-95 transition"
+              className="group flex items-center gap-2 px-3 py-2 rounded-3xl text-slate-600 border hover:text-red-500 hover:bg-red-50 transition-all active:scale-95 hover:cursor-pointer"
             >
-              Logout
+              <LogOut size={20} />
+              <span className="hidden md:block text-sm font-bold">Logout</span>
             </button>
           )}
         </div>
       </div>
+      
+      <form onSubmit={handleSearch} className="md:hidden mt-3 flex items-center bg-slate-100 rounded-xl px-3 py-2">
+          <Search size={16} className="text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search food..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none text-sm px-2"
+          />
+      </form>
+      <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 };
