@@ -40,7 +40,14 @@ const Auth = () => {
     { label: "North Indian", value: "north indian" },
     { label: "South Indian", value: "south indian" },
     { label: "Fast Food", value: "fast food" },
-    { label: "Bakery", value: "bakery" },
+    { label: "Chaat", value: "chaat" },
+    { label: "Chinese", value: "chinese" },
+    { label: "Biryani & Rice", value: "biryani and rice" },
+    { label: "Desserts & Sweets", value: "desserts and sweets" },
+    { label: "Beverages", value: "beverages" },
+    { label: "Salads", value: "salads" },
+    { label: "Seafood", value: "seafood" },
+    { label: "Thali", value: "thali" },
   ];
 
   const handleChange = (e) =>

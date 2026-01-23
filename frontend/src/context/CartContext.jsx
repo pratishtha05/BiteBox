@@ -1,100 +1,130 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
+const SERVER_URL = "http://localhost:3000/api/v1";
+
 export const CartProvider = ({ children }) => {
   const { token, isAuthenticated } = useAuth();
+
   const [cart, setCart] = useState([]);
   const [restaurantId, setRestaurantId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  const authHeaders = token
+    ? { headers: { Authorization: `Bearer ${token}` } }
+    : {};
+
+  // Fetch cart on login
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !token) {
+      setCart([]);
+      setRestaurantId(null);
+      return;
+    }
 
     const fetchCart = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/cart", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCart(res.data.items || []);
-        setRestaurantId(res.data.restaurantId || null);
+        setLoading(true);
+
+        const res = await axios.get(`${SERVER_URL}/cart`, authHeaders);
+
+        setCart(res.data?.items || []);
+        setRestaurantId(res.data?.restaurantId || null);
       } catch (err) {
-        console.error(err.response?.data || err.message);
+        console.error("Failed to fetch cart:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCart();
   }, [isAuthenticated, token]);
 
-  const saveCart = async (updatedCart, updatedRestaurantId) => {
+  // Persist cart
+  const persistCart = async (items, restId) => {
     try {
       await axios.post(
-        "http://localhost:3000/cart",
-        { items: updatedCart, restaurantId: updatedRestaurantId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${SERVER_URL}/cart`,
+        { items, restaurantId: restId },
+        authHeaders
       );
     } catch (err) {
-      console.error("Failed to save cart:", err.response?.data || err.message);
+      console.error("Failed to save cart:", err);
     }
   };
 
+  // Add item
   const addToCart = (item, restId) => {
-    setCart((prev) => {
-      if (restaurantId && restaurantId !== restId) {
-        alert("You can order from only one restaurant at a time");
-        return prev;
-      }
+    if (restaurantId && restaurantId !== restId) {
+      throw new Error("SINGLE_RESTAURANT_ONLY");
+    }
 
-      const existing = prev.find((i) => i.menuItem === item.menuItem);
-      let updatedCart;
+    const updatedCart = (() => {
+      const existing = cart.find((i) => i.menuItem === item.menuItem);
 
       if (existing) {
-        updatedCart = prev.map((i) =>
+        return cart.map((i) =>
           i.menuItem === item.menuItem
             ? { ...i, quantity: i.quantity + 1 }
             : i
         );
-      } else {
-        updatedCart = [...prev, { ...item, quantity: 1 }];
       }
 
-      setRestaurantId(restId);
-      saveCart(updatedCart, restId);
-      return updatedCart;
-    });
+      return [...cart, { ...item, quantity: 1 }];
+    })();
+
+    setCart(updatedCart);
+    setRestaurantId(restId);
+    persistCart(updatedCart, restId);
   };
 
-  const updateQty = (menuItem, qty) => {
-    setCart((prev) => {
-      const updatedCart = prev.map((i) =>
-        i.menuItem === menuItem ? { ...i, quantity: qty } : i
-      );
-      saveCart(updatedCart, restaurantId);
-      return updatedCart;
-    });
+  // Update quantity
+  const updateQty = (menuItem, quantity) => {
+    const updatedCart = cart.map((i) =>
+      i.menuItem === menuItem ? { ...i, quantity } : i
+    );
+
+    setCart(updatedCart);
+    persistCart(updatedCart, restaurantId);
   };
 
+  // Remove item
   const removeItem = (menuItem) => {
-    setCart((prev) => {
-      const updatedCart = prev.filter((i) => i.menuItem !== menuItem);
-      if (updatedCart.length === 0) setRestaurantId(null);
-      saveCart(updatedCart, updatedCart.length ? restaurantId : null);
-      return updatedCart;
-    });
+    const updatedCart = cart.filter((i) => i.menuItem !== menuItem);
+    const newRestaurantId = updatedCart.length ? restaurantId : null;
+
+    setCart(updatedCart);
+    setRestaurantId(newRestaurantId);
+    persistCart(updatedCart, newRestaurantId);
   };
 
-  const clearCart = () => {
-    setCart([]);
-    setRestaurantId(null);
-    axios.delete("http://localhost:3000/cart", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).catch((err) => console.error(err));
+  // Clear cart
+  const clearCart = async () => {
+    try {
+      await axios.delete(`${SERVER_URL}/cart`, authHeaders);
+    } catch (err) {
+      console.error("Failed to clear cart:", err);
+    } finally {
+      setCart([]);
+      setRestaurantId(null);
+    }
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, restaurantId, updateQty, removeItem, clearCart }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        restaurantId,
+        loading,
+        addToCart,
+        updateQty,
+        removeItem,
+        clearCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

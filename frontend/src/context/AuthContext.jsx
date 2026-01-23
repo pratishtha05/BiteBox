@@ -6,14 +6,13 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [role, setRole] = useState(null);
-
   const [user, setUser] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
   const [admin, setAdmin] = useState(null);
-  const [delivery, setDelivery] = useState(null); 
-
+  const [delivery, setDelivery] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Sync state with LocalStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedRole = localStorage.getItem("role");
@@ -22,78 +21,51 @@ export const AuthProvider = ({ children }) => {
       setToken(storedToken);
       setRole(storedRole);
 
-      if (storedRole === "user") {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        setUser({
-          ...storedUser,
-          isBlocked: storedUser?.isBlocked || false,
-          blockReason: storedUser?.blockReason || "",
-        });
-      }
-
-      if (storedRole === "restaurant") {
-        const storedRestaurant = JSON.parse(localStorage.getItem("restaurant"));
-        setRestaurant({
-          ...storedRestaurant,
-          isBlocked: storedRestaurant?.isBlocked || false,
-          blockReason: storedRestaurant?.blockReason || "",
-        });
-      }
-
-      if (storedRole === "admin") {
-        setAdmin(JSON.parse(localStorage.getItem("admin")));
-      }
-
-      if (storedRole === "delivery") {
-        const storedDelivery = JSON.parse(localStorage.getItem("delivery"));
-        setDelivery(storedDelivery);
+      try {
+        const storedData = JSON.parse(localStorage.getItem(storedRole));
+        if (storedRole === "user") setUser(storedData);
+        if (storedRole === "restaurant") setRestaurant(storedData);
+        if (storedRole === "admin") setAdmin(storedData);
+        if (storedRole === "delivery") setDelivery(storedData);
+      } catch (e) {
+        console.error("Error parsing stored auth data", e);
+        logout(); // Clear corrupted data
       }
     }
-
     setLoading(false);
   }, []);
 
   const login = async (role, payload) => {
     try {
-      const res = await axios.post(`http://localhost:3000/auth/${role}/login`, payload);
-      const { token, user, restaurant, admin, delivery } = res.data;
+      const res = await axios.post(`http://localhost:3000/api/v1/auth/${role}/login`, payload);
+      
+     
+      const { token, user, restaurant, admin, delivery } = res.data.data;
 
-      if (role === "restaurant" && restaurant?.isBlocked) {
-        throw new Error(`Restaurant is blocked: ${restaurant.blockReason}`);
+      // Handle Blocked Status
+      const account = user || restaurant || delivery;
+      if (account?.isBlocked) {
+        throw new Error(`${role.charAt(0).toUpperCase() + role.slice(1)} is blocked: ${account.blockReason || "No reason provided"}`);
       }
 
-      if (role === "user" && user?.isBlocked) {
-        throw new Error(`Your account is blocked: ${user.blockReason}`);
-      }
-
-      if (role === "delivery" && delivery?.isBlocked) {
-        throw new Error(`Delivery partner is blocked`);
-      }
-
+      // Persist to LocalStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
-
+      
       setToken(token);
       setRole(role);
 
-      if (role === "user" && user) {
-        const newUser = { ...user, isBlocked: user?.isBlocked || false, blockReason: user?.blockReason || "" };
-        localStorage.setItem("user", JSON.stringify(newUser));
-        setUser(newUser);
-      }
-
-      if (role === "restaurant" && restaurant) {
-        const newRestaurant = { ...restaurant, isBlocked: restaurant?.isBlocked || false, blockReason: restaurant?.blockReason || "" };
-        localStorage.setItem("restaurant", JSON.stringify(newRestaurant));
-        setRestaurant(newRestaurant);
-      }
-
-      if (role === "admin" && admin) {
+      // Map roles to state and storage
+      if (role === "user") {
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+      } else if (role === "restaurant") {
+        localStorage.setItem("restaurant", JSON.stringify(restaurant));
+        setRestaurant(restaurant);
+      } else if (role === "admin") {
         localStorage.setItem("admin", JSON.stringify(admin));
         setAdmin(admin);
-      }
-
-      if (role === "delivery" && delivery) {
+      } else if (role === "delivery") {
         localStorage.setItem("delivery", JSON.stringify(delivery));
         setDelivery(delivery);
       }
@@ -109,6 +81,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signup = async (role, payload) => {
+    try {
+      const config = role === "restaurant" 
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : {};
+
+      const res = await axios.post(`http://localhost:3000/api/v1/auth/${role}/signup`, payload, config);
+
+      // Automatically login after successful signup
+      let loginPayload;
+      if (role === "restaurant") {
+        loginPayload = {
+          email: payload.get("email"),
+          password: payload.get("password"),
+        };
+      } else {
+        loginPayload = {
+          email: payload.email,
+          password: payload.password,
+        };
+      }
+
+      await login(role, loginPayload);
+      return res.data;
+    } catch (err) {
+      throw new Error(
+        err?.response?.data?.message || 
+        err.message || 
+        "Signup failed"
+      );
+    }
+  };
+
   const logout = () => {
     localStorage.clear();
     setToken(null);
@@ -117,29 +122,6 @@ export const AuthProvider = ({ children }) => {
     setRestaurant(null);
     setAdmin(null);
     setDelivery(null);
-  };
-
-
-  const signup = async (role, payload) => {
-    if (role === "admin") throw new Error("Admin cannot signup");
-
-    try {
-      const res = await axios.post(`http://localhost:3000/auth/${role}/signup`, payload);
-
-    if (role === "restaurant") {
-      const loginPayload = {
-        email: payload.get("email"),
-        password: payload.get("password"),
-      };
-      await login(role, loginPayload);
-    } else {
-      await login(role, payload);
-    }
-
-    return res.data;
-    } catch (err) {
-      throw new Error(err?.response?.data?.message || err.message || "Signup failed");
-    }
   };
 
   const isAuthenticated = !!token;

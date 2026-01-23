@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, ChevronRight, Clock, Package, User, MapPin, Search, Hash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 import { useAuth } from "../../context/AuthContext";
 
-const STATUS_COLORS = {
-  placed: "bg-gray-100 text-gray-800",
-  accepted: "bg-blue-100 text-blue-800",
-  preparing: "bg-yellow-100 text-yellow-800",
-  "out for delivery": "bg-purple-100 text-purple-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+const SERVER_URL = "http://localhost:3000/api/v1";
+
+const STATUS_FLOW = ["placed", "accepted", "preparing", "out for delivery", "completed"];
+
+const STATUS_THEMES = {
+  placed: "bg-slate-100 text-slate-700 border-slate-200",
+  accepted: "bg-blue-50 text-blue-600 border-blue-100",
+  preparing: "bg-orange-50 text-orange-600 border-orange-100",
+  "out for delivery": "bg-purple-50 text-purple-600 border-purple-100",
+  completed: "bg-emerald-50 text-emerald-600 border-emerald-100",
 };
 
 const Orders = () => {
@@ -20,234 +22,213 @@ const Orders = () => {
 
   const [orders, setOrders] = useState([]);
   const [partners, setPartners] = useState([]);
-  const [openDates, setOpenDates] = useState({});
-  const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const formatDate = (date) =>
-    new Date(date).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+  const authHeaders = useMemo(() => ({
+    headers: { Authorization: `Bearer ${token}` },
+  }), [token]);
 
-  const isToday = (formattedDate) =>
-    formattedDate === formatDate(new Date());
-
-  const getLast7Days = () => {
-    const days = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days.push(formatDate(d));
-    }
-    return days;
-  };
-
-  const STATUS_FLOW = [
-    "placed",
-    "accepted",
-    "preparing",
-    "out for delivery",
-    "completed",
-  ];
-
-  const getNextStatus = (status) => {
-    const index = STATUS_FLOW.indexOf(status);
-    if (index === -1 || index === STATUS_FLOW.length - 1) return null;
-    return STATUS_FLOW[index + 1];
-  };
-
-  const fetchOrders = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:3000/order/restaurant",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setOrders(res.data);
+      const [ordRes, partRes] = await Promise.all([
+        axios.get(`${SERVER_URL}/orders/restaurant`, authHeaders),
+        axios.get(`${SERVER_URL}/delivery-partners/available`, authHeaders),
+      ]);
+      setOrders(ordRes.data.data || []);
+      setPartners(partRes.data.data || []);
     } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error("Sync failed");
     }
-  };
-
-  const fetchPartners = async () => {
-    const res = await axios.get(
-      "http://localhost:3000/delivery-partners/available",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setPartners(res.data);
-  };
+  }, [authHeaders]);
 
   useEffect(() => {
-    if (!token) return;
-    fetchOrders();
-    fetchPartners();
-  }, [token]);
+    if (token) {
+      setLoading(true);
+      fetchData().finally(() => setLoading(false));
+    }
+  }, [token, fetchData]);
 
-  const groupedOrders = orders.reduce((acc, order) => {
-    const key = formatDate(order.createdAt);
-    acc[key] = acc[key] || [];
-    acc[key].push(order);
-    return acc;
-  }, {});
-
-  const visibleDates = showAll
-    ? Object.keys(groupedOrders)
-    : getLast7Days();
-
-  useEffect(() => {
-    const state = {};
-    visibleDates.forEach((date) => {
-      state[date] = isToday(date);
-    });
-    setOpenDates(state);
-  }, [showAll, orders]);
-
-  const assignPartner = async (orderId, partnerId) => {
-    if (!partnerId) return;
-    await axios.put(
-      `http://localhost:3000/order/${orderId}/assign-delivery`,
-      { deliveryPartnerId: partnerId },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchOrders();
-  };
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
+      const matchesSearch = order._id.toLowerCase().includes(searchTerm.toLowerCase());
+      return orderDate === selectedDate && matchesSearch;
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [orders, selectedDate, searchTerm]);
 
   const updateStatus = async (orderId, status) => {
     try {
-      setUpdating(orderId);
-      await axios.put(
-        `http://localhost:3000/order/${orderId}/status`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchOrders();
+      setUpdatingOrderId(orderId);
+      await axios.put(`${SERVER_URL}/orders/${orderId}/status`, { status }, authHeaders);
+      await fetchData();
     } finally {
-      setUpdating(null);
+      setUpdatingOrderId(null);
     }
   };
 
-  if (loading)
-    return <p className="text-center text-gray-500 mt-10">Loading orders...</p>;
+  const assignPartner = async (orderId, partnerId) => {
+    if (!partnerId) return;
+    setUpdatingOrderId(orderId);
+    await axios.put(`${SERVER_URL}/orders/${orderId}/assign-delivery`, { deliveryPartnerId: partnerId }, authHeaders);
+    await fetchData();
+    setUpdatingOrderId(null);
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center bg-gray-50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium animate-pulse">Syncing Kitchen Feed...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-6 space-y-6">
-      
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="text-sm font-medium text-amber-600 hover:underline"
-        >
-          {showAll ? "View Last 7 Days" : "View All Orders"}
-        </button>
+    <div className="pb-20 bg-gray-50">
+      {/* --- MODERN NAV BAR --- */}
+      <div className="top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+        <div className=" px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+              Order Management
+            </h1>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative group">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+              <input 
+                type="text"
+                placeholder="Search ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-orange-500/20 outline-none w-full md:w-48 transition-all"
+              />
+            </div>
+            <div className="flex items-center gap-2 bg-white border border-gray-200 p-1.5 rounded-xl shadow-sm">
+              <Calendar size={16} className="ml-2 text-gray-500" />
+              <input 
+                type="date" 
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {visibleDates.map((date) => {
-        const dayOrders = groupedOrders[date] || [];
-        return (
-          <div key={date} className="bg-white rounded-xl shadow-md overflow-hidden">
-            <button
-              onClick={() =>
-                setOpenDates((p) => ({ ...p, [date]: !p[date] }))
-              }
-              className="w-full px-6 py-4 flex justify-between items-center border-b hover:bg-gray-50 transition"
-            >
-              <div>
-                <p className="font-semibold text-gray-800">{date}</p>
-                <p className="text-sm text-gray-500">
-                  {dayOrders.length} order{dayOrders.length > 1 ? "s" : ""}
-                </p>
-              </div>
-              {openDates[date] ? <ChevronUp /> : <ChevronDown />}
-            </button>
+      <div className="max-w-7xl mx-auto px-6 mt-8">
+        {filteredOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <Package className="text-gray-300" size={40} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">No Orders Found</h3>
+            <p className="text-gray-400 text-sm mt-1">Try a different date or clear your search.</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {filteredOrders.map((order) => {
+              const nextStatus = STATUS_FLOW[STATUS_FLOW.indexOf(order.status) + 1];
+              const isUpdating = updatingOrderId === order._id;
 
-            {openDates[date] && (
-              <div className="p-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3 transition-all duration-300">
-                {dayOrders.length === 0 && (
-                  <p className="text-gray-500 text-sm">
-                    No orders for this day
-                  </p>
-                )}
-
-                {dayOrders.map((order) => (
-                  <div
-                    key={order._id}
-                    className="border rounded-2xl p-5 space-y-4 hover:shadow-xl transition duration-300"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-gray-800">
-                        Order #{order._id.slice(-6)}
-                      </h3>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          STATUS_COLORS[order.status]
-                        }`}
-                      >
-                        {order.status}
-                      </span>
+              return (
+                <div key={order._id} className="group bg-white rounded-4xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                  {/* Card Header */}
+                  <div className="px-6 py-5 flex justify-between items-start border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                       <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
+                          <Hash size={18} />
+                       </div>
+                       <div>
+                          <p className="text-[10px] font-black text-gray-400 uppercase">ID</p>
+                          <p className="font-mono font-bold text-gray-900 leading-none">{order._id.slice(-6).toUpperCase()}</p>
+                       </div>
                     </div>
+                    <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border ${STATUS_THEMES[order.status]}`}>
+                      {order.status}
+                    </span>
+                  </div>
 
-                    <div className="text-sm text-gray-700">
-                      {order.items.map((i) => (
-                        <p key={i.menuItem}>
-                          {i.name} * {i.quantity}
-                        </p>
+                  {/* Body */}
+                  <div className="p-6 space-y-4">
+                    <div className="space-y-3">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm group/item">
+                          <div className="flex gap-3">
+                            <span className="flex items-center justify-center w-6 h-6 rounded-md bg-gray-50 text-gray-500 font-bold text-xs">{item.quantity}</span>
+                            <span className="text-gray-700 font-semibold">{item.name}</span>
+                          </div>
+                        </div>
                       ))}
                     </div>
 
-                    {!order.deliveryPartner ? (
-                      <select
-                        onChange={(e) =>
-                          assignPartner(order._id, e.target.value)
-                        }
-                        className="w-full border rounded-lg px-3 py-2"
-                      >
-                        <option value="">Assign delivery partner</option>
-                        {partners.map((p) => (
-                          <option key={p._id} value={p._id}>
-                            {p.name}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <div className="flex justify-between items-center bg-green-50 px-3 py-2 rounded-lg">
-                        <span className="text-sm font-medium text-green-700">
-                          {order.deliveryPartner.name}
-                        </span>
-                        <button
-                          onClick={() =>
-                            navigate(`/delivery-updates/${order._id}`)
-                          }
-                          className="text-sm text-amber-600 hover:underline"
-                        >
-                          View
-                        </button>
+                    <div className="pt-4 border-t border-dashed border-gray-100 flex justify-between items-center">
+                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Bill</p>
+                       <p className="text-xl font-black text-gray-900">₹{order.totalAmount}</p>
+                    </div>
+                  </div>
+
+                  {/* Footer Actions */}
+                  <div className="p-6 bg-gray-50/50 border-t border-gray-50 space-y-4">
+                    {order.status !== "placed" && (
+                      <div className="relative">
+                        {!order.deliveryPartner ? (
+                          <div className="flex items-center gap-2">
+                             <User size={14} className="text-gray-400 absolute left-3" />
+                             <select
+                               disabled={isUpdating}
+                               onChange={(e) => assignPartner(order._id, e.target.value)}
+                               className="w-full pl-9 pr-3 py-2.5 text-xs bg-white border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-orange-500/20 outline-none font-bold text-gray-700"
+                             >
+                               <option value="">Select Rider</option>
+                               {partners.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                             </select>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-emerald-100 shadow-sm">
+                            <div className="flex items-center gap-3">
+                               <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                  <User size={16} />
+                               </div>
+                               <div>
+                                  <p className="text-[8px] font-black text-emerald-600 uppercase">Assigned Rider</p>
+                                  <p className="text-xs font-bold text-gray-800">{order.deliveryPartner.name}</p>
+                               </div>
+                            </div>
+                            <button onClick={() => navigate(`/delivery-updates/${order._id}`)} className="p-2 hover:bg-emerald-50 rounded-lg text-emerald-600 transition-colors">
+                              <MapPin size={16} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {getNextStatus(order.status) && (
+                    {nextStatus ? (
                       <button
-                        disabled={updating === order._id}
-                        onClick={() =>
-                          updateStatus(order._id, getNextStatus(order.status))
-                        }
-                        className="w-full bg-linear-to-r from-amber-500 to-amber-600 text-white py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition"
+                        disabled={isUpdating}
+                        onClick={() => updateStatus(order._id, nextStatus)}
+                        className="w-full bg-gray-900 text-white text-xs font-black py-4 rounded-2xl hover:bg-orange-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-gray-200 hover:shadow-orange-200 disabled:opacity-50"
                       >
-                        Mark as {getNextStatus(order.status)}
+                        {isUpdating ? "UPDATING..." : `MOVE TO ${nextStatus.toUpperCase()}`}
+                        {!isUpdating && <ChevronRight size={16} />}
                       </button>
+                    ) : (
+                      <div className="w-full py-4 rounded-2xl bg-emerald-500 text-white text-xs font-black text-center">
+                        ORDER COMPLETED
+                      </div>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        )}
+      </div>
     </div>
   );
 };

@@ -1,53 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const Cart = require("../models/cart.model");
-
 const auth = require("../middlewares/auth.middleware");
+const { requireRole } = require("../middlewares/role.middleware");
+const cartController = require("../controllers/cart.controller");
 
+router.use(auth, requireRole("user"));
 
-router.get("/", auth, async (req, res) => {
-  if (req.auth.role !== "user") return res.status(403).json({ message: "Forbidden" });
-
-  const cart = await Cart.findOne({ user: req.auth.id });
-  res.json(cart || { items: [], restaurantId: null });
-});
-
-// POST: Update/Create cart
-router.post("/", auth, async (req, res) => {
-  if (req.auth.role !== "user") return res.status(403).json({ message: "Forbidden" });
-
-  try {
-    const { items, restaurantId } = req.body;
-
-    const preparedItems = items.map(item => ({
-      menuItem: item.menuItem,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity || 1,
-      image: item.image || "",
-    }));
-
-    const cart = await Cart.findOneAndUpdate(
-      { user: req.auth.id },
-      { items: preparedItems, restaurantId },
-      { new: true, upsert: true } 
-    );
-
-    res.json(cart);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message || "Server error" });
-  }
-});
-
-
-// DELETE: Clear cart
-router.delete("/", auth, async (req, res) => {
-  if (req.auth.role !== "user") return res.status(403).json({ message: "Forbidden" });
-
-  await Cart.findOneAndDelete({ user: req.auth.id });
-  res.json({ message: "Cart cleared" });
-});
+router.get("/", cartController.getCart);
+router.post("/", cartController.updateCart);
+router.delete("/", cartController.clearCart);
 
 module.exports = router;

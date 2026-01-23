@@ -1,48 +1,92 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
+const SERVER_URL = "http://localhost:3000/api/v1";
+
+const getStatusStyles = (status) => {
+  switch (status) {
+    case "pending":
+      return "bg-yellow-100 text-yellow-700";
+    case "accepted":
+    case "preparing":
+      return "bg-blue-100 text-blue-700";
+    case "completed":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-red-100 text-red-700";
+  }
+};
+
 const Orders = () => {
-  const { token, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
+  const { token, isAuthenticated, role } = useAuth();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const authHeaders = token
+    ? { headers: { Authorization: `Bearer ${token}` } }
+    : {};
 
   useEffect(() => {
-    if (!isAuthenticated || !token || role !== "user") return;
+    if (!isAuthenticated || role !== "user") return;
 
     const fetchOrders = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const res = await axios.get(
-          "http://localhost:3000/order/my-orders",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          `${SERVER_URL}/orders/me`,
+          authHeaders
         );
 
-        setOrders(res.data);
+        setOrders(res.data.data || []);
       } catch (err) {
-        console.error("FETCH ORDERS ERROR:", err.response?.data || err.message);
+        console.error("FETCH ORDERS ERROR:", err);
+        setError("Failed to load orders");
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [isAuthenticated, token, role]);
+  }, [isAuthenticated, role, token]);
 
   if (!isAuthenticated) {
-    return <p className="p-6 text-center text-gray-500">Please login to view your orders.</p>;
+    return (
+      <p className="p-6 text-center text-gray-500">
+        Please login to view your orders.
+      </p>
+    );
   }
 
   if (loading) {
-    return <p className="p-6 text-center text-gray-500">Loading your orders...</p>;
+    return (
+      <p className="p-6 text-center text-gray-500">
+        Loading your orders…
+      </p>
+    );
   }
 
-  if (orders.length === 0) {
-    return <p className="p-6 text-center text-gray-500">You have no orders yet.</p>;
+  if (error) {
+    return (
+      <p className="p-6 text-center text-red-500">
+        {error}
+      </p>
+    );
+  }
+
+  if (!orders.length) {
+    return (
+      <p className="p-6 text-center text-gray-500">
+        You have no orders yet.
+      </p>
+    );
   }
 
   return (
@@ -51,7 +95,10 @@ const Orders = () => {
 
       <div className="space-y-6">
         {orders.map((order) => (
-          <div key={order._id} className="bg-white shadow rounded-xl p-5">
+          <div
+            key={order._id}
+            className="bg-white shadow rounded-xl p-5"
+          >
             {/* Header */}
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-medium text-lg">
@@ -59,15 +106,9 @@ const Orders = () => {
               </h3>
 
               <span
-                className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  order.status === "pending"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : order.status === "accepted" || order.status === "preparing"
-                    ? "bg-blue-100 text-blue-700"
-                    : order.status === "completed"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyles(
+                  order.status
+                )}`}
               >
                 {order.status.toUpperCase()}
               </span>
@@ -76,13 +117,17 @@ const Orders = () => {
             {/* Items */}
             <div className="border-t border-gray-200 pt-3 space-y-2">
               {order.items.map((item) => (
-                <div key={item.menuItem} className="flex justify-between">
+                <div
+                  key={item.menuItem}
+                  className="flex justify-between"
+                >
                   <div>
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-gray-500">
                       ₹{item.price} × {item.quantity}
                     </p>
                   </div>
+
                   <p className="font-semibold">
                     ₹{item.price * item.quantity}
                   </p>
@@ -99,7 +144,7 @@ const Orders = () => {
               <button
                 onClick={() => navigate(`/track-order/${order._id}`)}
                 className="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm
-                  hover:bg-amber-600 hover:cursor-pointer active:scale-95 transition"
+                  hover:bg-amber-600 active:scale-95 transition"
               >
                 Track Order
               </button>

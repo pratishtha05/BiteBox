@@ -1,21 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ChevronLeft } from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+
+const SERVER_URL = "http://localhost:3000/api/v1";
 
 const Confirmation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const { token, role } = useAuth();
   const { clearCart } = useCart();
 
-  const { restaurantId, items, totalAmount } = location.state || {};
+  const { restaurantId, items = [], totalAmount } = location.state || {};
 
-  const [confirmed, setConfirmed] = useState(false);
   const [order, setOrder] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const authHeaders = token
+    ? { headers: { Authorization: `Bearer ${token}` } }
+    : {};
 
   useEffect(() => {
     if (!token || role !== "user") {
@@ -24,7 +33,7 @@ const Confirmation = () => {
   }, [token, role, navigate]);
 
   useEffect(() => {
-    if (!items || !items.length) {
+    if (!items.length) {
       navigate("/", { replace: true });
     }
   }, [items, navigate]);
@@ -32,22 +41,20 @@ const Confirmation = () => {
   const handleConfirmOrder = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const res = await axios.post(
-        "http://localhost:3000/order/create",
-        {
-          restaurantId,
-          items,
-          totalAmount,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${SERVER_URL}/orders`,
+        { restaurantId, items, totalAmount },
+        authHeaders
       );
 
       clearCart();
-      setOrder(res.data);
+      setOrder(res.data.data);
       setConfirmed(true);
     } catch (err) {
-      alert(err.response?.data?.message || "Order failed");
+      console.error("Order failed:", err);
+      setError(err.response?.data?.message || "Order failed");
     } finally {
       setLoading(false);
     }
@@ -58,20 +65,19 @@ const Confirmation = () => {
       <div className="bg-white rounded-2xl shadow-lg p-6">
         {!confirmed ? (
           <>
+            {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-800">
-                {confirmed ? "Order Confirmed" : "Review Order"}
+                Review Order
               </h1>
 
               <button
                 onClick={() =>
-                  navigate(`/menu/${restaurantId || order?.restaurant?._id}`, {
-                    replace: true,
-                  })
+                  navigate(`/menu/${restaurantId}`, { replace: true })
                 }
-                className="text-sm font-medium text-amber-600 hover:underline hover:cursor-pointer"
+                className="font-medium text-amber-600 hover:underline"
               >
-                ← Back to Menu
+                <ChevronLeft className="inline" /> Back to Menu
               </button>
             </div>
 
@@ -82,11 +88,10 @@ const Confirmation = () => {
                   key={item.menuItem}
                   className="flex gap-4 items-center border rounded-xl p-3"
                 >
-                  {/* Image */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                     {item.image ? (
                       <img
-                        src={`http://localhost:3000${item.image}`}
+                        src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
                         onError={(e) =>
@@ -100,7 +105,6 @@ const Confirmation = () => {
                     )}
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1">
                     <h3 className="font-medium capitalize">{item.name}</h3>
                     <p className="text-sm text-gray-500">
@@ -121,6 +125,10 @@ const Confirmation = () => {
               <span className="font-bold text-xl">₹{totalAmount}</span>
             </div>
 
+            {error && (
+              <p className="text-sm text-red-500 mb-4">{error}</p>
+            )}
+
             <button
               disabled={loading}
               onClick={handleConfirmOrder}
@@ -134,12 +142,16 @@ const Confirmation = () => {
           <>
             {/* Success */}
             <div className="text-center">
-              <CheckCircle size={64} className="mx-auto text-amber-500 mb-4" />
+              <CheckCircle
+                size={64}
+                className="mx-auto text-amber-500 mb-4"
+              />
               <h2 className="text-2xl font-bold mb-2">
                 Order Placed Successfully!
               </h2>
               <p className="text-gray-600">
-                Order ID: <span className="font-semibold">#{order._id}</span>
+                Order ID:{" "}
+                <span className="font-semibold">#{order._id}</span>
               </p>
             </div>
 
@@ -150,7 +162,7 @@ const Confirmation = () => {
                   className="flex justify-between text-sm"
                 >
                   <span>
-                    {item.name} * {item.quantity}
+                    {item.name} × {item.quantity}
                   </span>
                   <span>₹{item.price * item.quantity}</span>
                 </div>
