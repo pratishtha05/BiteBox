@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { ChevronLeft, ShoppingBag, Info} from "lucide-react";
 
 const SERVER_URL = "http://localhost:3000/api/v1/public";

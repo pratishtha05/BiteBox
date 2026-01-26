@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import axios from "axios";
 import { Eye, EyeOff, User, Shield, Trash2, CheckCircle, AlertCircle, Camera, Edit3, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const SERVER_URL = "http://localhost:3000/api/v1";
 
