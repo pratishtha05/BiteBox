@@ -127,27 +127,12 @@ const Dashboard = () => {
                     alt={restaurant.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                    <Star size={12} className="fill-amber-500 text-amber-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-800">4.5</span>
-                  </div>
                 </div>
 
                 <div className="p-5">
                   <h3 className="text-lg font-black text-slate-900 mb-1 leading-tight group-hover:text-amber-600 transition-colors">
                     {restaurant.name}
                   </h3>
-                  <div className="flex items-center gap-3 text-slate-400 text-xs font-medium">
-                    <div className="flex items-center gap-1">
-                      <Clock size={12} />
-                      <span>25-30 min</span>
-                    </div>
-                    <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                    <div className="flex items-center gap-1">
-                      <MapPin size={12} />
-                      <span className="truncate max-w-25">{restaurant.address?.split(',')[0] || 'Nearby'}</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}
