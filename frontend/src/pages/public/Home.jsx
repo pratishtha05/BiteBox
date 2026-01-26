@@ -66,7 +66,7 @@ const Dashboard = () => {
         {/* Categories Section */}
         <div className="relative mb-12 group">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Popular Categories</h2>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">Popular Categories</h2>
             <div className="flex gap-1">
               <button onClick={() => scroll('left')} className="p-1.5 rounded-full border border-slate-200 hover:bg-white hover:shadow-md transition-all text-slate-600"><ChevronLeft size={18}/></button>
               <button onClick={() => scroll('right')} className="p-1.5 rounded-full border border-slate-200 hover:bg-white hover:shadow-md transition-all text-slate-600"><ChevronRight size={18}/></button>

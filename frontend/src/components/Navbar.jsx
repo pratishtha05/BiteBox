@@ -40,7 +40,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="w-full bg-white/80 backdrop-blur-md top-0 z-50 shadow-sm px-4 md:px-12 py-3 transition-all">
+    <header className="w-full bg-white/80 backdrop-blur-md top-0 z-50 shadow-sm px-4 md:px-10 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 md:gap-8">
         
         {/* Branding/Greeting */}

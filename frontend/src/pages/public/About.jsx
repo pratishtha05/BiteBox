@@ -11,26 +11,35 @@ const About = () => {
           <div className="lg:col-span-6 space-y-8 z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full">
               <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">Our Story</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
+                Our Story
+              </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-[0.9]">
               Reimagining <br />
-              <span className="text-amber-500 italic font-serif">The Meal</span> Experience.
+              <span className="text-amber-500 italic font-serif">
+                The Meal
+              </span>{" "}
+              Experience.
             </h1>
             <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-lg">
-              BiteBox isn't just about delivery. We're building the digital bridge between 
-              world-class kitchens and your dining table, making food discovery 
-              as delightful as the first bite.
+              BiteBox isn't just about delivery. We're building the digital
+              bridge between world-class kitchens and your dining table, making
+              food discovery as delightful as the first bite.
             </p>
             <div className="flex items-center gap-8 pt-4">
               <div>
                 <p className="text-2xl font-black">500+</p>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Partners</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Partners
+                </p>
               </div>
               <div className="w-px h-10 bg-slate-100" />
               <div>
                 <p className="text-2xl font-black">12k+</p>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Daily Meals</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Daily Meals
+                </p>
               </div>
             </div>
           </div>
@@ -57,8 +66,9 @@ const About = () => {
               </div>
               <h3 className="text-xl font-black tracking-tight">Our Mission</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
-                To empower local culinary talent by providing them with the tools to reach 
-                discerning food lovers, ensuring quality and convenience coexist.
+                To empower local culinary talent by providing them with the
+                tools to reach discerning food lovers, ensuring quality and
+                convenience coexist.
               </p>
             </div>
 
@@ -69,8 +79,8 @@ const About = () => {
               </div>
               <h3 className="text-xl font-black tracking-tight">Our Vision</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
-                A world where geographical boundaries don't limit your palate. We aim to 
-                be the global standard for flavor discovery.
+                A world where geographical boundaries don't limit your palate.
+                We aim to be the global standard for flavor discovery.
               </p>
             </div>
 
@@ -81,8 +91,8 @@ const About = () => {
               </div>
               <h3 className="text-xl font-black tracking-tight">Our Promise</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
-                Every meal passed through BiteBox meets a rigorous standard of freshness, 
-                packaging quality, and rapid logistics.
+                Every meal passed through BiteBox meets a rigorous standard of
+                freshness, packaging quality, and rapid logistics.
               </p>
             </div>
           </div>
@@ -91,45 +101,72 @@ const About = () => {
 
       {/* BRAND VALUES */}
       <section className="py-24 px-6 max-w-4xl mx-auto text-center">
-        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-12">Why We Exist</h2>
+        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-12">
+          Why We Exist
+        </h2>
         <div className="flex flex-col md:flex-row items-center justify-center gap-16">
-           <div className="flex flex-col items-center gap-2 ">
-             <Zap size={20} className="text-amber-500" />
-             <span className="text-[10px] font-black uppercase tracking-widest">Instant</span>
-           </div>
-           <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
-           <div className="flex flex-col items-center gap-2">
-             <Heart size={20} className="text-rose-500" />
-             <span className="text-[10px] font-black uppercase tracking-widest">Curated</span>
-           </div>
-           <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
-           <div className="flex flex-col items-center gap-2">
-             <Award size={20} className="text-indigo-500" />
-             <span className="text-[10px] font-black uppercase tracking-widest">Premium</span>
-           </div>
-           <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
-           <div className="flex flex-col items-center gap-2">
-             <Target size={20} className="text-emerald-500" />
-             <span className="text-[10px] font-black uppercase tracking-widest">Reliable</span>
-           </div>
+          <div className="flex flex-col items-center gap-2 ">
+            <Zap size={20} className="text-amber-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Instant
+            </span>
+          </div>
+          <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
+          <div className="flex flex-col items-center gap-2">
+            <Heart size={20} className="text-rose-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Curated
+            </span>
+          </div>
+          <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
+          <div className="flex flex-col items-center gap-2">
+            <Award size={20} className="text-indigo-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Premium
+            </span>
+          </div>
+          <div className="w-px h-8 bg-slate-200 mx-auto md:mx-0" />
+          <div className="flex flex-col items-center gap-2">
+            <Target size={20} className="text-emerald-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Reliable
+            </span>
+          </div>
         </div>
       </section>
 
       {/* CALL TO ACTION */}
-      <section className="pb-20 px-6 mt-10">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            Ready to Elevate Your Dining Experience?
+      <section className="relative mt-10 p-10 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-linear-to-br from-amber-400 via-amber-500 to-orange-500" />
+        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm" />
+
+        {/* Content */}
+        <div className="relative max-w-4xl mx-auto text-center space-y-4">
+      
+          <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            Elevate Your <span className="text-white">Dining Experience</span>
           </h2>
-          <p className="text-slate-500 text-sm font-medium leading-relaxed">
-            Join BiteBox today and embark on a culinary journey that transcends
-            boundaries. Discover, savor, and celebrate food like never before.
+
+          <p className="max-w-2xl mx-auto text-white/90 text-base leading-relaxed">
+            Join BiteBox and explore a world of flavors crafted to delight every
+            craving. Discover, savor, and celebrate food like never before.
           </p>
-          <Link to="/auth">
-            <button className="px-8 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all active:scale-95 cursor-pointer">
-              Get Started
-            </button>
-          </Link>
+
+          {/* CTA */}
+          <div className="pt-4 flex justify-center gap-4">
+            <Link to="/auth">
+              <button className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-xs font-extrabold uppercase tracking-widest shadow-lg hover:bg-slate-800 hover:cursor-pointer transition-all active:scale-95">
+                Get Started
+              </button>
+            </Link>
+
+            <Link to="/">
+              <button className="px-10 py-4 bg-white/90 text-slate-900 rounded-2xl text-xs font-extrabold uppercase tracking-widest hover:bg-white transition-all hover:cursor-pointer active:scale-95">
+                Explore Food
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

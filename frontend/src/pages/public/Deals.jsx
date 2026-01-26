@@ -26,7 +26,7 @@ const Deals = () => {
   }, []);
 
   return (
-    <section className="py-5 px-6 bg-white">
+    <section className="py-5 px-6 ">
       <div className="max-w-6xl mx-auto">
         
         {/* HEADER */}
