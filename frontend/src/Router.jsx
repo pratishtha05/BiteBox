@@ -11,7 +11,7 @@ import DeliveryRoutes from "./routes/DeliveryRoutes.jsx";
 import PublicRoutes from "./routes/PublicRoutes.jsx";
 
 import Orders from "./pages/user/Orders.jsx";
-import Settings from "./pages/Settings.jsx";
+import Settings from "./pages/user/Settings.jsx";
 import Confirmation from "./pages/user/Confirmation.jsx";
 import TrackOrder from "./pages/user/TrackOrder.jsx";
 import NotFound from "./pages/public/NotFound.jsx";

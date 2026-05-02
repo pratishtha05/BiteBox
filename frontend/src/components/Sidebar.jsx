@@ -25,6 +25,7 @@ const PUBLIC_NAV = [
   { label: "About Us", path: "/about", icon: Info },
   { label: "FAQs", path: "/faqs", icon: HelpCircle },
   { label: "Contact Us", path: "/contact", icon: MessageSquare },
+  { label: "Reels", path: "/reels", icon: Heart },
 ];
 
 const USER_NAV = [

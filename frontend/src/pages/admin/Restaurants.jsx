@@ -123,23 +123,19 @@ const Restaurants = () => {
                       {restaurant.name}
                     </span>
                   </div>
-
                   <span className="text-gray-500">
-                    {restaurant.email}
-                  </span>
-                  <span className="text-gray-500">
-                    {restaurant.phone}
+                    {restaurant.email} | {restaurant.phone}
                   </span>
                   <span
                     className={`font-semibold ${
                       restaurant.isBlocked
                         ? "text-red-600"
-                        : "text-green-600"
+                        : ""
                     }`}
                   >
                     {restaurant.isBlocked
-                      ? `Blocked (${restaurant.blockReason})`
-                      : "Active"}
+                      ? `Blocked`
+                      : ""}
                   </span>
                 </div>
 

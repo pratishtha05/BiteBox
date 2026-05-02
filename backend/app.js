@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const fs = require("fs");
+const path = require("path");
 
 dotenv.config();
 
@@ -22,6 +24,19 @@ app.use("/api/v1/orders", require("./routes/order.routes"));
 app.use("/api/v1/cart", require("./routes/cart.routes"));
 app.use("/api/v1/delivery-partners", require("./routes/delivery.routes"));
 app.use("/api/v1/public", require("./routes/public.routes"));
+app.get("/api/v1/reels", (req, res) => {
+  const uploadPath = path.join(__dirname, "uploads");
+
+  const files = fs.readdirSync(uploadPath);
+
+  const reels = files
+    .filter((file) => file.endsWith(".mp4"))
+    .map((file) => ({
+      videoUrl: `uploads/${file}`,
+    }));
+
+  res.json({ reels });
+});
 
 // 404 Handler
 app.use((req, res) => {

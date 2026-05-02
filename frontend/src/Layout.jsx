@@ -14,6 +14,7 @@ const Layout = ({ children }) => {
     "/faqs",
     "/contact",
     "/help",
+    "/reels", 
   ];
 
   const showNavbar = !hideNavbarPaths.includes(location.pathname);

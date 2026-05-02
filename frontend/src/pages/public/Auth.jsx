@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   User,
   Store,
@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  ChevronDown,
   Mail,
   Lock
 } from "lucide-react";
@@ -93,6 +92,16 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4 antialiased text-slate-900">
+      {/* back to home button */}
+      <div className="absolute top-30 left-60">
+        <Link
+            type="button"
+            to="/"
+            className="inline-flex items-center gap-2 text-sm hover:cursor-pointer font-bold uppercase tracking-wider text-slate-400 hover:text-amber-500 transition-colors mb-6"
+          >
+            <ArrowLeft size={14} /> Back To Home
+          </Link>
+      </div>
       
       {/* Step 1: Role Selection */}
       {step === "role" && (

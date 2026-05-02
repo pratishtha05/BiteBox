@@ -5,13 +5,14 @@ import Layout from "../Layout"
 
 import Home from "../pages/public/Home.jsx";
 import Auth from "../pages/public/Auth.jsx";
-import RestaurantMenu from "../pages/RestaurantMenu.jsx";
+import RestaurantMenu from "../pages/public/RestaurantMenu.jsx";
 import Deals from "../pages/public/Deals.jsx";
 import SearchResults from "../pages/public/SearchResults.jsx";
 import About from "../pages/public/About.jsx";
 import FAQ from "../pages/public/FAQ.jsx";
 import Contact from "../pages/public/Contact.jsx";
 import Help from "../pages/public/Help.jsx";
+import Reels from "../pages/public/Reels.jsx";
 
 
 const PublicRoutes = () => {
@@ -87,6 +88,15 @@ const PublicRoutes = () => {
           element={
             <Layout>
               <SearchResults />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="reels"
+          element={
+            <Layout>
+              <Reels />
             </Layout>
           }
         />
