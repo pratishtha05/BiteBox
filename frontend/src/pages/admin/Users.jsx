@@ -45,9 +45,6 @@ const Users = () => {
     fetchUsers();
   }, [token]);
 
-  /* =========================
-     Block / Unblock
-  ========================= */
   const handleBlockUnblock = async (userId, action) => {
     if (action === "block" && !blockModal.reason) {
       return showMessage("Please provide a reason", "error");
@@ -77,7 +74,7 @@ const Users = () => {
 
     try {
       const res = await api.get(`/admin/users/${userId}/orders`, authHeaders);
-      console.log(res.data.data);
+
       setOrdersByUser((prev) => ({
         ...prev,
         [userId]: res.data.data || [],
@@ -89,15 +86,20 @@ const Users = () => {
   };
 
   if (loading) {
-    return <p className="text-center py-10 text-gray-500">Loading users…</p>;
+    return (
+      <p className="text-center py-10 text-gray-500 px-4">
+        Loading users…
+      </p>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-6">
+
       {/* Message */}
       {message.text && (
         <p
-          className={`p-3 rounded-md text-center transition ${
+          className={`p-3 rounded-md text-center text-sm sm:text-base ${
             message.type === "success"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
@@ -119,25 +121,40 @@ const Users = () => {
             >
               {/* Header */}
               <div
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3 p-4 cursor-pointer"
                 onClick={() => setExpandedUser(isExpanded ? null : user._id)}
               >
-                <div className="flex flex-col sm:flex-row sm:gap-6">
+                {/* Left Info */}
+                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-5 text-sm sm:text-base">
+                  {/* Avatar */}
                   {user.imageUrl ? (
                     <img
                       src={user.imageUrl}
                       alt={user.name}
-                      className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                      <User className="h-8 w-8 text-gray-400" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 flex items-center justify-center border">
+                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
                     </div>
                   )}
-                  <span className="font-medium text-gray-900">{user.name}</span>
-                  <span className="text-gray-500">{user.email}</span>
-                  <span className="text-gray-500">{user.phone}</span>
-                  <span className="text-gray-500">{user.gender}</span>
+
+                  <span className="font-medium text-gray-900">
+                    {user.name}
+                  </span>
+
+                  <span className="text-gray-500 break-all">
+                    {user.email}
+                  </span>
+
+                  <span className="text-gray-500">
+                    {user.phone}
+                  </span>
+
+                  <span className="text-gray-500">
+                    {user.gender}
+                  </span>
+
                   <span
                     className={`font-semibold ${
                       user.isBlocked ? "text-red-600" : "text-green-600"
@@ -149,7 +166,8 @@ const Users = () => {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4">
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {!user.isBlocked ? (
                     <button
                       onClick={(e) => {
@@ -160,7 +178,7 @@ const Users = () => {
                           reason: "",
                         });
                       }}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 active:scale-95"
+                      className="px-3 sm:px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 active:scale-95"
                     >
                       Block
                     </button>
@@ -170,7 +188,7 @@ const Users = () => {
                         e.stopPropagation();
                         handleBlockUnblock(user._id, "unblock");
                       }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 active:scale-95"
+                      className="px-3 sm:px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 active:scale-95"
                     >
                       Unblock
                     </button>
@@ -181,7 +199,7 @@ const Users = () => {
                       e.stopPropagation();
                       toggleOrders(user._id);
                     }}
-                    className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 active:scale-95"
+                    className="px-3 sm:px-4 py-2 text-sm bg-amber-500 text-white rounded-lg hover:bg-amber-600 active:scale-95"
                   >
                     {ordersByUser[user._id] ? "Hide Orders" : "View Orders"}
                   </button>
@@ -197,23 +215,15 @@ const Users = () => {
 
               {/* Expanded */}
               {isExpanded && (
-                <div className="p-4 bg-gray-50 border-t rounded-b-xl">
+                <div className="p-4 bg-gray-50 border-t rounded-b-xl text-sm sm:text-base space-y-2">
                   <h3 className="font-semibold text-gray-700 mb-2">
                     User Details
                   </h3>
 
-                  <p>
-                    <strong>Name:</strong> {user.name}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {user.email}
-                  </p>
-                  <p>
-                    <strong>Phone:</strong> {user.phone}
-                  </p>
-                  <p>
-                    <strong>Gender:</strong> {user.gender}
-                  </p>
+                  <p><strong>Name:</strong> {user.name}</p>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Phone:</strong> {user.phone}</p>
+                  <p><strong>Gender:</strong> {user.gender}</p>
                   <p>
                     <strong>Status:</strong>{" "}
                     {user.isBlocked
@@ -230,9 +240,9 @@ const Users = () => {
                       {ordersByUser[user._id].length === 0 ? (
                         <p className="text-gray-500">No orders found</p>
                       ) : (
-                        <ul className="list-disc pl-6 text-gray-600">
+                        <ul className="list-disc pl-5 space-y-1 text-gray-600">
                           {ordersByUser[user._id].map((order) => (
-                            <li key={order._id}>
+                            <li key={order._id} className="break-words">
                               {order.items.map((i) => i.name).join(", ")} - ₹
                               {order.totalAmount} -{" "}
                               {new Date(order.createdAt).toLocaleString()}
@@ -251,7 +261,7 @@ const Users = () => {
 
       {/* Block Modal */}
       {blockModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-3">
           <div
             className="absolute inset-0 backdrop-blur-sm"
             onClick={() =>
@@ -259,8 +269,10 @@ const Users = () => {
             }
           />
 
-          <div className="relative bg-white p-6 rounded-2xl w-96 shadow-lg z-10 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Block User</h2>
+          <div className="relative bg-white p-5 sm:p-6 rounded-2xl w-full max-w-sm sm:max-w-md shadow-lg space-y-4">
+            <h2 className="text-base sm:text-lg font-semibold">
+              Block User
+            </h2>
 
             <textarea
               placeholder="Reason for blocking"
@@ -271,7 +283,7 @@ const Users = () => {
                   reason: e.target.value,
                 }))
               }
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400"
+              className="w-full p-3 border rounded-lg text-sm sm:text-base"
             />
 
             <div className="flex justify-end gap-3">
@@ -283,14 +295,16 @@ const Users = () => {
                     reason: "",
                   })
                 }
-                className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+                className="px-3 sm:px-4 py-2 border rounded-lg text-sm active:scale-95"
               >
                 Cancel
               </button>
 
               <button
-                onClick={() => handleBlockUnblock(blockModal.userId, "block")}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={() =>
+                  handleBlockUnblock(blockModal.userId, "block")
+                }
+                className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg text-sm active:scale-95"
               >
                 Block
               </button>

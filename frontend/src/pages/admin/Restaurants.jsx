@@ -67,18 +67,19 @@ const Restaurants = () => {
 
   if (loading) {
     return (
-      <p className="text-center py-10 text-gray-500">
+      <p className="text-center py-10 text-gray-500 px-4">
         Loading restaurants…
       </p>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-6">
+
       {/* Message */}
       {message && (
         <p
-          className={`p-3 rounded-md text-center ${
+          className={`p-3 rounded-md text-center text-sm sm:text-base ${
             message.type === "success"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
@@ -100,41 +101,41 @@ const Restaurants = () => {
             >
               {/* Header */}
               <div
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 cursor-pointer"
                 onClick={() =>
                   setExpandedId(isExpanded ? null : restaurant._id)
                 }
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
-                  <div className="flex items-center gap-4">
+                {/* Left Info */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <img
                       src={
                         restaurant.image || "/placeholder-restaurant.jpg"
                       }
                       alt={restaurant.name}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                     />
-                    <span className="font-medium">
+                    <span className="font-medium text-sm sm:text-base">
                       {restaurant.name}
                     </span>
                   </div>
-                  <span className="text-gray-500">
+
+                  <span className="text-gray-500 text-xs sm:text-sm break-all">
                     {restaurant.email} | {restaurant.phone}
                   </span>
+
                   <span
-                    className={`font-semibold ${
-                      restaurant.isBlocked
-                        ? "text-red-600"
-                        : ""
+                    className={`font-semibold text-sm ${
+                      restaurant.isBlocked ? "text-red-600" : ""
                     }`}
                   >
-                    {restaurant.isBlocked
-                      ? `Blocked`
-                      : ""}
+                    {restaurant.isBlocked ? "Blocked" : ""}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-3">
                   {!restaurant.isBlocked ? (
                     <button
                       onClick={(e) => {
@@ -145,7 +146,7 @@ const Restaurants = () => {
                           reason: "",
                         });
                       }}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 active:scale-95"
+                      className="px-3 sm:px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 active:scale-95"
                     >
                       Block
                     </button>
@@ -155,7 +156,7 @@ const Restaurants = () => {
                         e.stopPropagation();
                         updateStatus(restaurant._id, "unblock");
                       }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 active:scale-95"
+                      className="px-3 sm:px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 active:scale-95"
                     >
                       Unblock
                     </button>
@@ -172,16 +173,27 @@ const Restaurants = () => {
 
               {/* Expanded Details */}
               {isExpanded && (
-                <div className="p-4 bg-gray-50 border-t rounded-b-xl space-y-2 text-sm">
+                <div className="p-4 bg-gray-50 border-t rounded-b-xl space-y-2 text-sm sm:text-base">
                   <h3 className="font-semibold text-gray-700">
                     Restaurant Details
                   </h3>
-                  <p><strong>ID:</strong> {restaurant.restaurantId}</p>
-                  <p><strong>Name:</strong> {restaurant.name}</p>
-                  <p><strong>Email:</strong> {restaurant.email}</p>
-                  <p><strong>Phone:</strong> {restaurant.phone}</p>
-                  <p><strong>Address:</strong> {restaurant.address}</p>
+
+                  <p className="break-words">
+                    <strong>ID:</strong> {restaurant.restaurantId}
+                  </p>
+                  <p className="break-words">
+                    <strong>Name:</strong> {restaurant.name}
+                  </p>
+                  <p className="break-words">
+                    <strong>Email:</strong> {restaurant.email}
+                  </p>
                   <p>
+                    <strong>Phone:</strong> {restaurant.phone}
+                  </p>
+                  <p className="break-words">
+                    <strong>Address:</strong> {restaurant.address}
+                  </p>
+                  <p className="break-words">
                     <strong>Categories:</strong>{" "}
                     {restaurant.categories?.join(", ")}
                   </p>
@@ -194,15 +206,18 @@ const Restaurants = () => {
 
       {/* Block Modal */}
       {blockModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-3">
           <div
             className="absolute inset-0 backdrop-blur-sm"
             onClick={() =>
               setBlockModal({ open: false, restaurantId: null, reason: "" })
             }
           />
-          <div className="relative bg-white p-6 rounded-2xl w-96 shadow-lg space-y-4">
-            <h2 className="text-lg font-semibold">Block Restaurant</h2>
+
+          <div className="relative bg-white p-5 sm:p-6 rounded-2xl w-full max-w-sm sm:max-w-md shadow-lg space-y-4">
+            <h2 className="text-base sm:text-lg font-semibold">
+              Block Restaurant
+            </h2>
 
             <textarea
               value={blockModal.reason}
@@ -213,7 +228,7 @@ const Restaurants = () => {
                 }))
               }
               placeholder="Reason for blocking"
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-sm sm:text-base"
             />
 
             <div className="flex justify-end gap-3">
@@ -221,15 +236,16 @@ const Restaurants = () => {
                 onClick={() =>
                   setBlockModal({ open: false, restaurantId: null, reason: "" })
                 }
-                className="px-4 py-2 border rounded-lg"
+                className="px-3 sm:px-4 py-2 border rounded-lg text-sm active:scale-95"
               >
                 Cancel
               </button>
+
               <button
                 onClick={() =>
                   updateStatus(blockModal.restaurantId, "block")
                 }
-                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg text-sm active:scale-95"
               >
                 Block
               </button>

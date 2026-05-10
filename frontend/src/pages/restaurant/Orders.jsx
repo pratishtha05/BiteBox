@@ -85,17 +85,19 @@ const Orders = () => {
 
   return (
     <div className="pb-20 bg-gray-50">
-      {/* --- MODERN NAV BAR --- */}
+      
+      {/* NAV */}
       <div className="top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className=" px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
               Order Management
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative group">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full md:w-auto">
+            
+            <div className="relative group w-full sm:w-auto">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
               <input 
                 type="text"
@@ -105,101 +107,117 @@ const Orders = () => {
                 className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-orange-500/20 outline-none w-full md:w-48 transition-all"
               />
             </div>
-            <div className="flex items-center gap-2 bg-white border border-gray-200 p-1.5 rounded-xl shadow-sm">
+
+            <div className="flex items-center gap-2 bg-white border border-gray-200 p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
               <Calendar size={16} className="ml-2 text-gray-500" />
               <input 
                 type="date" 
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer"
+                className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer w-full sm:w-auto"
               />
             </div>
+
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-8">
+      {/* CONTENT */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
+        
         {filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex flex-col items-center justify-center py-24 sm:py-32 bg-white rounded-3xl border border-gray-100 shadow-sm">
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
               <Package className="text-gray-300" size={40} />
             </div>
             <h3 className="text-xl font-bold text-gray-900">No Orders Found</h3>
-            <p className="text-gray-400 text-sm mt-1">Try a different date or clear your search.</p>
+            <p className="text-gray-400 text-sm mt-1 text-center px-4">
+              Try a different date or clear your search.
+            </p>
           </div>
         ) : (
+          
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            
             {filteredOrders.map((order) => {
               const nextStatus = STATUS_FLOW[STATUS_FLOW.indexOf(order.status) + 1];
               const isUpdating = updatingOrderId === order._id;
 
               return (
                 <div key={order._id} className="group bg-white rounded-4xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                  {/* Card Header */}
+                  
+                  {/* HEADER */}
                   <div className="px-6 py-5 flex justify-between items-start border-b border-gray-50">
                     <div className="flex items-center gap-3">
-                       <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
-                          <Hash size={18} />
-                       </div>
-                       <div>
-                          <p className="text-[10px] font-black text-gray-400 uppercase">ID</p>
-                          <p className="font-mono font-bold text-gray-900 leading-none">{order._id.slice(-6).toUpperCase()}</p>
-                       </div>
+                      <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
+                        <Hash size={18} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase">ID</p>
+                        <p className="font-mono font-bold text-gray-900 leading-none">
+                          {order._id.slice(-6).toUpperCase()}
+                        </p>
+                      </div>
                     </div>
+
                     <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border ${STATUS_THEMES[order.status]}`}>
                       {order.status}
                     </span>
                   </div>
 
-                  {/* Body */}
+                  {/* BODY */}
                   <div className="p-6 space-y-4">
-                    <div className="space-y-3">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between text-sm group/item">
-                          <div className="flex gap-3">
-                            <span className="flex items-center justify-center w-6 h-6 rounded-md bg-gray-50 text-gray-500 font-bold text-xs">{item.quantity}</span>
-                            <span className="text-gray-700 font-semibold">{item.name}</span>
-                          </div>
+                    {order.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <div className="flex gap-3">
+                          <span className="flex items-center justify-center w-6 h-6 rounded-md bg-gray-50 text-gray-500 font-bold text-xs">
+                            {item.quantity}
+                          </span>
+                          <span className="text-gray-700 font-semibold">
+                            {item.name}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
 
                     <div className="pt-4 border-t border-dashed border-gray-100 flex justify-between items-center">
-                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Bill</p>
-                       <p className="text-xl font-black text-gray-900">₹{order.totalAmount}</p>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Bill</p>
+                      <p className="text-xl font-black text-gray-900">₹{order.totalAmount}</p>
                     </div>
                   </div>
 
-                  {/* Footer Actions */}
+                  {/* FOOTER */}
                   <div className="p-6 bg-gray-50/50 border-t border-gray-50 space-y-4">
+                    
                     {order.status !== "placed" && (
                       <div className="relative">
                         {!order.deliveryPartner ? (
                           <div className="flex items-center gap-2">
-                             <User size={14} className="text-gray-400 absolute left-3" />
-                             <select
-                               disabled={isUpdating}
-                               onChange={(e) => assignPartner(order._id, e.target.value)}
-                               className="w-full pl-9 pr-3 py-2.5 text-xs bg-white border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-orange-500/20 outline-none font-bold text-gray-700"
-                             >
-                               <option value="">Select Rider</option>
-                               {partners.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
-                             </select>
+                            <User size={14} className="text-gray-400 absolute left-3" />
+                            <select
+                              disabled={isUpdating}
+                              onChange={(e) => assignPartner(order._id, e.target.value)}
+                              className="w-full pl-9 pr-3 py-2.5 text-xs bg-white border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-orange-500/20 outline-none font-bold text-gray-700"
+                            >
+                              <option value="">Select Rider</option>
+                              {partners.map(p => (
+                                <option key={p._id} value={p._id}>{p.name}</option>
+                              ))}
+                            </select>
                           </div>
                         ) : (
                           <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-emerald-100 shadow-sm">
                             <div className="flex items-center gap-3">
-                               <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                  <User size={16} />
-                               </div>
-                               <div>
-                                  <p className="text-[8px] font-black text-emerald-600 uppercase">Assigned Rider</p>
-                                  <p className="text-xs font-bold text-gray-800">{order.deliveryPartner.name}</p>
-                               </div>
+                              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <User size={16} />
+                              </div>
+                              <div>
+                                <p className="text-[8px] font-black text-emerald-600 uppercase">Assigned Rider</p>
+                                <p className="text-xs font-bold text-gray-800">
+                                  {order.deliveryPartner.name}
+                                </p>
+                              </div>
                             </div>
-                            <button onClick={() => navigate(`/delivery-updates/${order._id}`)} className="p-2 hover:bg-emerald-50 rounded-lg text-emerald-600 transition-colors">
-                              <MapPin size={16} />
-                            </button>
                           </div>
                         )}
                       </div>
@@ -223,6 +241,7 @@ const Orders = () => {
                 </div>
               );
             })}
+
           </div>
         )}
       </div>

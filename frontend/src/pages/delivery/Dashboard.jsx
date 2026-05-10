@@ -50,30 +50,33 @@ const DeliveryDashboard = () => {
   };
 
   if (loading) {
-    return <p className="text-gray-500">Loading orders...</p>;
+    return <p className="text-gray-500 px-3 sm:px-4">Loading orders...</p>;
   }
 
   if (!orders.length) {
-    return <p className="text-gray-500">No assigned orders</p>;
+    return <p className="text-gray-500 px-3 sm:px-4">No assigned orders</p>;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4 px-3 sm:px-4 md:px-6">
       {orders.map((order) => (
         <div
           key={order._id}
-          className="border p-4 rounded-lg bg-white shadow-sm"
+          className="border p-4 sm:p-5 rounded-lg bg-white shadow-sm w-full"
         >
-          <p>
+          <p className="text-sm sm:text-base">
             <strong>Order ID:</strong> {order._id}
           </p>
-          <p>
+
+          <p className="text-sm sm:text-base">
             <strong>Restaurant:</strong> {order.restaurant?.name || "—"}
           </p>
-          <p>
+
+          <p className="text-sm sm:text-base">
             <strong>Customer:</strong> {order.customer?.name || "—"}
           </p>
-          <p>
+
+          <p className="text-sm sm:text-base">
             <strong>Status:</strong>{" "}
             <span className="capitalize">
               {order.deliveryStatus?.replace(/_/g, " ")}

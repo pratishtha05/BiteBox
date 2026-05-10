@@ -52,23 +52,24 @@ const SearchResults = () => {
   );
 
   return (
-    <div className="pb-10">
+    <div className="pb-10 w-full overflow-x-hidden">
       {/* Header */}
       <div className="bg-white border-b border-slate-100 top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-1 text-slate-500 hover:text-amber-600 transition-colors font-semibold text-sm hover:cursor-pointer active:scale-95"
           >
             <ChevronLeft size={20} /> Back
           </button>
-          <div className="w-10" /> {/* Spacer for symmetry */}
+
+          <div className="w-10" />
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} />
             ))}
@@ -77,14 +78,16 @@ const SearchResults = () => {
           <>
             {/* NO RESULTS STATE */}
             {restaurants.length === 0 && foods.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20">
+              <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center px-4">
                 <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-4">
                   <Search size={40} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">
+
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 break-words">
                   No matches for "{query}"
                 </h3>
-                <p className="text-slate-500 text-sm mt-1">
+
+                <p className="text-slate-500 text-sm mt-1 max-w-sm">
                   Try checking for typos or use more general keywords.
                 </p>
               </div>
@@ -92,18 +95,19 @@ const SearchResults = () => {
 
             {/* Restaurant Results */}
             {restaurants.length > 0 && (
-              <section className="mb-12 pr-2 pl-2">
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">
+              <section className="mb-10 sm:mb-12 px-1 sm:px-2">
+                <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-5 sm:mb-6">
                   Top Restaurants
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                   {restaurants.map((restaurant) => (
                     <div
                       key={restaurant._id}
                       onClick={() => navigate(`/menu/${restaurant._id}`)}
-                      className="group cursor-pointer bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 transition-all hover:shadow-xl hover:-translate-y-1 shadow-sm"
+                      className="group cursor-pointer bg-white rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-slate-100 transition-all hover:shadow-xl hover:-translate-y-1 shadow-sm w-full"
                     >
-                      <div className="relative h-48 overflow-hidden bg-slate-100">
+                      <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
                         <img
                           src={
                             restaurant.image ||
@@ -112,30 +116,36 @@ const SearchResults = () => {
                           alt={restaurant.name}
                           className="w-full h-full object-cover"
                         />
+
                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
                           <Star
                             size={12}
                             className="fill-amber-500 text-amber-500"
                           />
+
                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-800">
                             4.5
                           </span>
                         </div>
                       </div>
 
-                      <div className="p-5">
-                        <h3 className="text-lg font-black text-slate-900 mb-1 leading-tight group-hover:text-amber-600 transition-colors">
+                      <div className="p-4 sm:p-5">
+                        <h3 className="text-base sm:text-lg font-black text-slate-900 mb-2 leading-tight group-hover:text-amber-600 transition-colors line-clamp-1">
                           {restaurant.name}
                         </h3>
-                        <div className="flex items-center gap-3 text-slate-400 text-xs font-medium">
+
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-slate-400 text-[11px] sm:text-xs font-medium">
                           <div className="flex items-center gap-1">
                             <Clock size={12} />
                             <span>25-30 min</span>
                           </div>
-                          <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                          <div className="flex items-center gap-1">
-                            <MapPin size={12} />
-                            <span className="truncate max-w-25">
+
+                          <span className="hidden sm:block w-1 h-1 bg-slate-200 rounded-full" />
+
+                          <div className="flex items-center gap-1 min-w-0">
+                            <MapPin size={12} className="shrink-0" />
+
+                            <span className="truncate max-w-[120px] sm:max-w-25">
                               {restaurant.address?.split(",")[0] || "Nearby"}
                             </span>
                           </div>
@@ -150,35 +160,40 @@ const SearchResults = () => {
             {/* Food Dish Results */}
             {foods.length > 0 && (
               <section>
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">
+                <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-5 sm:mb-6">
                   Dishes
                 </h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {foods.map((food) => (
                     <div
                       key={food._id}
                       onClick={() => navigate(`/menu/${food.restaurant._id}`)}
-                      className="group flex items-center gap-4 bg-white p-3 rounded-3xl shadow-sm hover:-translate-y-1 hover:shadow-sm transition-all cursor-pointer"
+                      className="group flex items-center gap-3 sm:gap-4 bg-white p-3 rounded-3xl shadow-sm hover:-translate-y-1 hover:shadow-sm transition-all cursor-pointer overflow-hidden"
                     >
-                      <div className="relative w-24 h-24 shrink-0 rounded-2xl overflow-hidden">
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl overflow-hidden">
                         <img
                           src={food.image}
                           alt={food.name}
                           className="w-full h-full object-cover transition-transform duration-500"
                         />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-black text-slate-900 group-hover:text-amber-600 transition-colors">
+
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black text-sm sm:text-base text-slate-900 group-hover:text-amber-600 transition-colors truncate">
                           {food.name}
                         </p>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter mb-2">
+
+                        <p className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-tighter mb-2 truncate">
                           From {food.restaurant?.name}
                         </p>
-                        <div className="flex items-center text-[10px] font-black text-amber-500 uppercase tracking-widest">
-                          View in Menu{" "}
+
+                        <div className="flex items-center text-[9px] sm:text-[10px] font-black text-amber-500 uppercase tracking-widest">
+                          View in Menu
+
                           <ArrowRight
                             size={12}
-                            className="ml-1 group-hover:translate-x-1 transition-transform"
+                            className="ml-1 group-hover:translate-x-1 transition-transform shrink-0"
                           />
                         </div>
                       </div>

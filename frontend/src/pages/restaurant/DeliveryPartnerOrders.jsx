@@ -23,8 +23,7 @@ const DeliveryPartnerOrders = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        }
-      );
+      });
 
       setOrders(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
@@ -44,33 +43,39 @@ const DeliveryPartnerOrders = () => {
   ========================= */
   if (loading) {
     return (
-      <p className="text-center mt-10 text-gray-500">
-        Loading orders…
-      </p>
+      <div className="px-4">
+        <p className="text-center mt-10 text-gray-500 text-sm sm:text-base">
+          Loading orders…
+        </p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <p className="text-center mt-10 text-red-500">
-        {error}
-      </p>
+      <div className="px-4">
+        <p className="text-center mt-10 text-red-500 text-sm sm:text-base">
+          {error}
+        </p>
+      </div>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <p className="text-center mt-10 text-gray-500">
-        No orders assigned to this partner yet.
-      </p>
+      <div className="px-4">
+        <p className="text-center mt-10 text-gray-500 text-sm sm:text-base">
+          No orders assigned to this partner yet.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="px-4 sm:px-6 py-6 space-y-4 max-w-6xl mx-auto">
       <Link
         to="/restaurant/delivery-partners"
-        className="text-amber-600 hover:underline font-medium"
+        className="inline-block text-amber-600 hover:underline font-medium text-sm sm:text-base break-words"
       >
         ← Back to Delivery Partners
       </Link>
@@ -78,25 +83,28 @@ const DeliveryPartnerOrders = () => {
       {orders.map((order) => (
         <div
           key={order._id}
-          className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-2
-                     hover:shadow-2xl transition-shadow"
+          className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col gap-3
+                     hover:shadow-2xl transition-shadow overflow-hidden"
         >
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-gray-800">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <h3 className="font-semibold text-gray-800 text-sm sm:text-base break-all">
               Order #{order._id?.slice(-6)}
             </h3>
-            <span className="text-gray-500 text-sm">
+
+            <span className="text-gray-500 text-xs sm:text-sm break-words">
               {new Date(order.createdAt).toLocaleString()}
             </span>
           </div>
 
-          <div className="text-gray-700 text-sm space-y-1">
-            <p>
+          <div className="text-gray-700 text-sm space-y-2 break-words">
+            <p className="leading-relaxed">
               <strong>Customer:</strong>{" "}
-              {order.customer?.name} ({order.customer?.phone})
+              <span className="break-all">
+                {order.customer?.name} ({order.customer?.phone})
+              </span>
             </p>
 
-            <p>
+            <p className="leading-relaxed">
               <strong>Items:</strong>{" "}
               {order.items
                 ?.map((i) => `${i.name} x${i.quantity}`)
@@ -108,11 +116,11 @@ const DeliveryPartnerOrders = () => {
               {Number(order.totalAmount || 0).toFixed(2)}
             </p>
 
-            <p>
+            <p className="capitalize">
               <strong>Order Status:</strong> {order.status}
             </p>
 
-            <p>
+            <p className="capitalize">
               <strong>Delivery Status:</strong>{" "}
               {order.deliveryStatus?.replaceAll("_", " ")}
             </p>

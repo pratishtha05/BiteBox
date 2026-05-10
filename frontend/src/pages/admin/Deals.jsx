@@ -39,13 +39,11 @@ const Deals = () => {
     [token]
   );
 
-  /* ---------------- UTIL ---------------- */
   const showMessage = (text, type = "success") => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), 4000);
   };
 
-  /* ---------------- FETCH ---------------- */
   const fetchDeals = async () => {
     try {
       setLoading(true);
@@ -62,14 +60,12 @@ const Deals = () => {
     fetchDeals();
   }, [api]);
 
-  /* ---------------- CLEANUP PREVIEW ---------------- */
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  /* ---------------- FILE CHANGE ---------------- */
   const handleFileChange = (e, isEditing = false) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -83,7 +79,6 @@ const Deals = () => {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  /* ---------------- CREATE ---------------- */
   const handleCreate = async () => {
     try {
       const formData = new FormData();
@@ -106,7 +101,6 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- UPDATE ---------------- */
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
@@ -128,7 +122,6 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- STATUS ---------------- */
   const toggleStatus = async (deal) => {
     try {
       await api.put(`/admin/deals/${deal._id}`, {
@@ -140,7 +133,6 @@ const Deals = () => {
     }
   };
 
-  /* ---------------- DELETE ---------------- */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this deal?")) return;
 
@@ -154,10 +146,11 @@ const Deals = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-4 space-y-8">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-6 sm:space-y-8">
+
       {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           Deals Management
         </h1>
 
@@ -166,7 +159,7 @@ const Deals = () => {
             setPreviewUrl(null);
             setShowCreateModal(true);
           }}
-          className="flex items-center gap-2 bg-amber-500 text-white px-5 py-3 rounded-xl hover:bg-amber-600 transition cursor-pointer active:scale-95"
+          className="flex items-center justify-center gap-2 bg-amber-500 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl hover:bg-amber-600 transition active:scale-95 w-full sm:w-auto"
         >
           <Plus size={18} /> Add Deal
         </button>
@@ -175,7 +168,7 @@ const Deals = () => {
       {/* MESSAGE */}
       {message.text && (
         <div
-          className={`px-4 py-3 rounded-xl text-center font-medium ${
+          className={`px-4 py-3 rounded-xl text-center font-medium text-sm sm:text-base ${
             message.type === "success"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
@@ -186,14 +179,13 @@ const Deals = () => {
       )}
 
       {/* GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
         {deals.map((deal) => (
           <div
             key={deal._id}
             className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col"
           >
-            {/* IMAGE */}
-            <div className="h-48 bg-gray-100 relative">
+            <div className="h-44 sm:h-48 bg-gray-100 relative">
               {deal.image ? (
                 <img
                   src={deal.image}
@@ -207,7 +199,7 @@ const Deals = () => {
               )}
 
               <span
-                className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${
+                className={`absolute top-2 sm:top-3 right-2 sm:right-3 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold ${
                   deal.isActive
                     ? "bg-green-500 text-white"
                     : "bg-red-500 text-white"
@@ -217,41 +209,43 @@ const Deals = () => {
               </span>
             </div>
 
-            {/* CONTENT */}
-            <div className="p-5 flex-1 space-y-2">
-              <h3 className="font-bold text-xl">{deal.title}</h3>
-              <p className="text-gray-600 text-sm line-clamp-2">
+            <div className="p-4 sm:p-5 flex-1 space-y-2">
+              <h3 className="font-bold text-lg sm:text-xl">
+                {deal.title}
+              </h3>
+
+              <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">
                 {deal.description}
               </p>
 
-              <p className="text-xs text-amber-600 font-medium">
+              <p className="text-[11px] sm:text-xs text-amber-600 font-medium">
                 Valid Till:{" "}
                 {deal.validTill
                   ? new Date(deal.validTill).toDateString()
                   : "Unlimited"}
               </p>
 
-              <div className="flex gap-4 pt-4 border-t">
+              <div className="flex flex-wrap gap-3 pt-4 border-t text-sm">
                 <button
                   onClick={() => {
                     setEditingDeal(deal);
                     setPreviewUrl(null);
                   }}
-                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm cursor-pointer active:scale-95"
+                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 active:scale-95"
                 >
                   <Pencil size={14} /> Edit
                 </button>
 
                 <button
                   onClick={() => toggleStatus(deal)}
-                  className="text-amber-600 hover:text-amber-800 text-sm cursor-pointer active:scale-95"
+                  className="text-amber-600 hover:text-amber-800 active:scale-95"
                 >
                   {deal.isActive ? "Deactivate" : "Activate"}
                 </button>
 
                 <button
                   onClick={() => handleDelete(deal._id)}
-                  className="text-red-600 hover:text-red-800 flex items-center gap-1 text-sm ml-auto cursor-pointer active:scale-95"
+                  className="text-red-600 hover:text-red-800 flex items-center gap-1 ml-auto active:scale-95"
                 >
                   <Trash2 size={14} /> Delete
                 </button>
@@ -263,29 +257,29 @@ const Deals = () => {
 
       {/* MODAL */}
       {(showCreateModal || editingDeal) && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md relative space-y-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
+          <div className="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-md relative space-y-4">
+
             <button
               onClick={() => {
                 setShowCreateModal(false);
                 setEditingDeal(null);
                 setPreviewUrl(null);
               }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 cursor-pointer"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
             >
               <X />
             </button>
 
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-lg sm:text-xl font-semibold">
               {editingDeal ? "Edit Deal" : "Create New Deal"}
             </h2>
 
-            {/* IMAGE UPLOAD */}
             <div className="flex flex-col items-center gap-2 border-2 border-dashed rounded-xl p-4 bg-gray-50">
               {previewUrl || editingDeal?.image ? (
                 <img
                   src={previewUrl || editingDeal.image}
-                  className="h-32 w-full object-cover rounded-lg"
+                  className="h-28 sm:h-32 w-full object-cover rounded-lg"
                   alt="Preview"
                 />
               ) : (
@@ -308,7 +302,7 @@ const Deals = () => {
 
             <input
               placeholder="Title"
-              className="border rounded-xl px-4 py-3 w-full"
+              className="border rounded-xl px-4 py-3 w-full text-sm sm:text-base"
               value={editingDeal ? editingDeal.title : form.title}
               onChange={(e) =>
                 editingDeal
@@ -323,7 +317,7 @@ const Deals = () => {
             <textarea
               placeholder="Description"
               rows="3"
-              className="border rounded-xl px-4 py-3 w-full"
+              className="border rounded-xl px-4 py-3 w-full text-sm sm:text-base"
               value={
                 editingDeal ? editingDeal.description : form.description
               }
@@ -342,7 +336,7 @@ const Deals = () => {
 
             <input
               type="date"
-              className="border rounded-xl px-4 py-3 w-full"
+              className="border rounded-xl px-4 py-3 w-full text-sm sm:text-base"
               value={
                 editingDeal
                   ? editingDeal.validTill?.split("T")[0] || ""
@@ -363,7 +357,7 @@ const Deals = () => {
 
             <button
               onClick={editingDeal ? handleUpdate : handleCreate}
-              className="w-full bg-amber-500 text-white py-3 rounded-xl hover:bg-amber-600 transition font-bold cursor-pointer active:scale-95"
+              className="w-full bg-amber-500 text-white py-3 rounded-xl hover:bg-amber-600 transition font-bold active:scale-95"
             >
               {editingDeal ? "Update Deal" : "Save Deal"}
             </button>

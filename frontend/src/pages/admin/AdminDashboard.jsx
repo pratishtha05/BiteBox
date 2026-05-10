@@ -13,13 +13,15 @@ import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 
 const StatCard = ({ title, value, icon: Icon }) => (
-  <div className="rounded-2xl border border-gray-200 bg-white p-5 flex items-center justify-between shadow-sm hover:shadow-md transition">
+  <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 flex items-center justify-between shadow-sm hover:shadow-md transition w-full">
     <div>
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-3xl font-semibold text-gray-900">{value}</p>
+      <p className="text-xs sm:text-sm text-gray-500">{title}</p>
+      <p className="text-2xl sm:text-3xl font-semibold text-gray-900">
+        {value}
+      </p>
     </div>
     <div className="rounded-xl bg-amber-50 p-2">
-      <Icon className="h-6 w-6 text-amber-500" />
+      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
     </div>
   </div>
 );
@@ -48,13 +50,12 @@ const AdminDashboard = () => {
         setLoading(true);
         setError(null);
 
-        const res = await api.get(
-          "/admin/dashboard",
-          authHeaders
-        );
+        const res = await api.get("/admin/dashboard", authHeaders);
 
         setStats(res.data.data?.stats || null);
-        setActivity(res.data.data?.recentActivity || { users: [], restaurants: [] });
+        setActivity(
+          res.data.data?.recentActivity || { users: [], restaurants: [] }
+        );
       } catch (err) {
         console.error("Dashboard fetch failed:", err);
         setError("Failed to load dashboard");
@@ -66,23 +67,22 @@ const AdminDashboard = () => {
     fetchDashboard();
   }, [token]);
 
-  
   if (loading) {
-    return <div className="p-6 text-gray-500">Loading dashboard…</div>;
+    return <div className="p-4 sm:p-6 text-gray-500">Loading dashboard…</div>;
   }
 
   if (error) {
-    return <div className="p-6 text-red-500">{error}</div>;
+    return <div className="p-4 sm:p-6 text-red-500">{error}</div>;
   }
 
   if (!stats) {
-    return <div className="p-6 text-gray-500">No data available</div>;
+    return <div className="p-4 sm:p-6 text-gray-500">No data available</div>;
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
         <StatCard
           title="Restaurants"
@@ -102,29 +102,29 @@ const AdminDashboard = () => {
       </div>
 
       {/* Activity + Attention */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
         {/* Attention */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm w-full">
+          <h2 className="text-xs sm:text-sm font-semibold text-gray-900 mb-4">
             Attention Required
           </h2>
 
-          <div className="space-y-4 text-sm">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4 text-xs sm:text-sm">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-gray-600">Blocked Restaurants</span>
               <button
                 onClick={() => navigate("/admin/restaurants")}
-                className="flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium hover:underline"
+                className="flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium hover:underline whitespace-nowrap"
               >
                 Review <ArrowUpRight size={14} />
               </button>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-gray-600">Blocked Users</span>
               <button
                 onClick={() => navigate("/admin/users")}
-                className="flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium hover:underline"
+                className="flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium hover:underline whitespace-nowrap"
               >
                 Review <ArrowUpRight size={14} />
               </button>
@@ -133,41 +133,36 @@ const AdminDashboard = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm w-full">
           <div className="flex items-center gap-2 mb-4">
             <div className="rounded-lg bg-amber-50 p-1.5">
               <Activity className="h-4 w-4 text-amber-500" />
             </div>
-            <h2 className="text-sm font-semibold text-gray-900">
+            <h2 className="text-xs sm:text-sm font-semibold text-gray-900">
               Recent Activity
             </h2>
           </div>
 
-          <ul className="space-y-3 text-sm text-gray-600">
+          <ul className="space-y-3 text-xs sm:text-sm text-gray-600">
             {activity.restaurants.map((r) => (
-              <li key={r._id}>
+              <li key={r._id} className="break-words">
                 • Restaurant{" "}
-                <span className="font-medium text-gray-900">
-                  “{r.name}”
-                </span>{" "}
+                <span className="font-medium text-gray-900">“{r.name}”</span>{" "}
                 registered
               </li>
             ))}
 
             {activity.users.map((u) => (
-              <li key={u._id}>
+              <li key={u._id} className="break-words">
                 • New user{" "}
-                <span className="font-medium text-gray-900">
-                  “{u.name}”
-                </span>{" "}
+                <span className="font-medium text-gray-900">“{u.name}”</span>{" "}
                 registered
               </li>
             ))}
 
-            {!activity.users.length &&
-              !activity.restaurants.length && (
-                <li className="text-gray-400">No recent activity</li>
-              )}
+            {!activity.users.length && !activity.restaurants.length && (
+              <li className="text-gray-400">No recent activity</li>
+            )}
           </ul>
         </div>
       </div>
