@@ -10,7 +10,7 @@ const Reels = () => {
   useEffect(() => {
     const fetchReels = async () => {
       try {
-        const res = await api.get("/public/reels");
+        const res = await api.get("/reels");
         setReels(res.data.reels || []);
       } catch (err) {
         console.error(err);
