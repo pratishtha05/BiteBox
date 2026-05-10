@@ -9,7 +9,10 @@ dotenv.config();
 const app = express();
 
 // Global Middlewares
-app.use(cors());
+app.use(cors({
+  origin: "https://bitebox-three.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
@@ -24,46 +27,6 @@ app.use("/api/v1/orders", require("./routes/order.routes"));
 app.use("/api/v1/cart", require("./routes/cart.routes"));
 app.use("/api/v1/delivery-partners", require("./routes/delivery.routes"));
 app.use("/api/v1/public", require("./routes/public.routes"));
-// app.get("/api/v1/reels", (req, res) => {
-//   const uploadPath = path.join(__dirname, "uploads");
-
-//   const files = fs.readdirSync(uploadPath);
-
-//   const reels = files
-//     .filter((file) => file.endsWith(".mp4"))
-//     .map((file) => ({
-//       videoUrl: `uploads/${file}`,
-//     }));
-
-//   res.json({ reels });
-// });
-app.get("/api/v1/reels", (req, res) => {
-  try {
-    const uploadPath = path.join(__dirname, "uploads");
-
-    if (!fs.existsSync(uploadPath)) {
-      return res.json({ reels: [] });
-    }
-
-    const files = fs.readdirSync(uploadPath);
-
-    const reels = files
-      .filter((file) => file.endsWith(".mp4"))
-      .map((file) => ({
-        videoUrl: `/uploads/${file}`,
-      }));
-
-    res.json({ reels });
-
-  } catch (err) {
-    console.error(err);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch reels",
-    });
-  }
-});
 
 // 404 Handler
 app.use((req, res) => {
