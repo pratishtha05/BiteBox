@@ -1,23 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import api from "../../utils/api";
 import { Heart, MessageCircle, Send, ChevronDown, Music, MoreHorizontal } from "lucide-react";
 
 const Reels = () => {
-  const [reels, setReels] = useState([]);
+  const [reels, setReels] = useState([
+    { videoUrl: "/reels/reel1.mp4" },
+    { videoUrl: "/reels/reel2.mp4" },
+    { videoUrl: "/reels/reel3.mp4" },
+    { videoUrl: "/reels/reel4.mp4" },
+    { videoUrl: "/reels/reel5.mp4" },
+    { videoUrl: "/reels/reel6.mp4" },
+    { videoUrl: "/reels/reel7.mp4" },
+  ]);
+
   const containerRef = useRef(null);
   const videoRefs = useRef([]);
-
-  useEffect(() => {
-    const fetchReels = async () => {
-      try {
-        const res = await api.get("/reels");
-        setReels(res.data.reels || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchReels();
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,8 +30,9 @@ const Reels = () => {
     );
 
     videoRefs.current.forEach((v) => v && observer.observe(v));
+
     return () => observer.disconnect();
-  }, [reels]);
+  }, []);
 
   const scrollToNext = () => {
     if (containerRef.current) {
@@ -50,17 +47,22 @@ const Reels = () => {
     const handleKeyDown = (e) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
+
         scrollToNext();
       }
+
       if (e.key === "ArrowUp") {
         e.preventDefault();
+
         containerRef.current.scrollBy({
           top: -containerRef.current.clientHeight,
           behavior: "smooth",
         });
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
+
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
@@ -78,11 +80,12 @@ const Reels = () => {
           {/* Video Layer */}
           <video
             ref={(el) => (videoRefs.current[index] = el)}
-            src={`http://localhost:3000/${reel.videoUrl}`}
+            src={reel.videoUrl}
             className="h-full w-full object-cover md:object-contain bg-white/10 "
             muted
             loop
             playsInline
+            preload="auto"
             onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
           />
 
@@ -98,4 +101,5 @@ const Reels = () => {
     </div>
   );
 };
+
 export default Reels;
