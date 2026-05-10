@@ -1,9 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { Trash2, Edit, ImageIcon, Plus, X, Search, UtensilsCrossed, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const INITIAL_FORM_STATE = {
   name: "",
@@ -31,7 +29,7 @@ const Menu = () => {
   const fetchMenu = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${SERVER_URL}/menu`, authHeaders);
+      const res = await api.get("/menu", authHeaders);
       setItems(res.data.data || []);
     } catch (err) {
       setError("Failed to sync menu with server.");
@@ -67,9 +65,9 @@ const Menu = () => {
 
     try {
       if (editingId) {
-        await axios.put(`${SERVER_URL}/menu/${editingId}`, formData, authHeaders);
+        await api.put(`/menu/${editingId}`, formData, authHeaders);
       } else {
-        await axios.post(`${SERVER_URL}/menu/createMenuItem`, formData, authHeaders);
+        await api.post("/menu/createMenuItem", formData, authHeaders);
       }
       resetForm();
       fetchMenu();
@@ -87,7 +85,7 @@ const Menu = () => {
   const toggleAvailability = async (item) => {
     try {
       setItems(prev => prev.map(i => i._id === item._id ? {...i, isAvailable: !i.isAvailable} : i));
-      await axios.put(`${SERVER_URL}/menu/${item._id}`, { isAvailable: !item.isAvailable }, authHeaders);
+      await api.put(`/menu/${item._id}`, { isAvailable: !item.isAvailable }, authHeaders);
     } catch (err) {
       fetchMenu();
     }

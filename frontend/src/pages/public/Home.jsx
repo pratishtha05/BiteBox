@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import {
   Utensils, Soup, Pizza, CakeSlice, Coffee, Leaf, Fish, ShoppingBag,
   ChevronLeft, ChevronRight, Star, Clock, MapPin, Search
 } from "lucide-react";
-
-const SERVER_URL = "http://localhost:3000/api/v1/public";
 
 const categoryIcons = {
   "north indian": Soup, "south indian": Soup, "fast food": Pizza,
@@ -27,7 +25,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/categories`);
+        const res = await api.get("/public/categories");
         setCategories(res.data.categories || []);
       } catch (err) { console.error(err); }
     };
@@ -39,10 +37,13 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const url = selectedCategory
-          ? `${SERVER_URL}/restaurants?category=${encodeURIComponent(selectedCategory)}`
-          : `${SERVER_URL}/restaurants`;
-        const res = await axios.get(url);
-        setRestaurants(res.data.data.restaurants || []);
+          ? `/public/restaurants?category=${encodeURIComponent(selectedCategory)}`
+          : `/public/restaurants`;
+        const res = await api.get(url);
+        console.log("FULL RESPONSE:", res);
+    console.log("DATA:", res.data);
+
+    setRestaurants(res?.data?.data?.restaurants || []);
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
     };

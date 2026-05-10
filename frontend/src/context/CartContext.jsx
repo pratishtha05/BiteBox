@@ -2,9 +2,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
-const CartContext = createContext();
+import api from "../utils/api";
 
-const SERVER_URL = "http://localhost:3000/api/v1";
+const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token, isAuthenticated } = useAuth();
@@ -29,7 +29,7 @@ export const CartProvider = ({ children }) => {
       try {
         setLoading(true);
 
-        const res = await axios.get(`${SERVER_URL}/cart`, authHeaders);
+        const res = await api.get("/cart", authHeaders);
 
         setCart(res.data?.items || []);
         setRestaurantId(res.data?.restaurantId || null);
@@ -46,11 +46,7 @@ export const CartProvider = ({ children }) => {
   // Persist cart
   const persistCart = async (items, restId) => {
     try {
-      await axios.post(
-        `${SERVER_URL}/cart`,
-        { items, restaurantId: restId },
-        authHeaders
-      );
+      await api.post("/cart", { items, restaurantId: restId }, authHeaders);
     } catch (err) {
       console.error("Failed to save cart:", err);
     }
@@ -104,7 +100,7 @@ export const CartProvider = ({ children }) => {
   // Clear cart
   const clearCart = async () => {
     try {
-      await axios.delete(`${SERVER_URL}/cart`, authHeaders);
+      await api.delete("/cart", authHeaders);
     } catch (err) {
       console.error("Failed to clear cart:", err);
     } finally {

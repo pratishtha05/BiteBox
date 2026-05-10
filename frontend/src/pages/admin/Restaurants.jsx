@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { ChevronDown } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const Restaurants = () => {
   const { token } = useAuth();
@@ -32,10 +30,7 @@ const Restaurants = () => {
   const fetchRestaurants = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `${SERVER_URL}/admin/restaurants`,
-        authHeaders
-      );
+      const res = await api.get("/admin/restaurants", authHeaders);
       setRestaurants(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -51,8 +46,8 @@ const Restaurants = () => {
     }
 
     try {
-      await axios.put(
-        `${SERVER_URL}/admin/restaurants/${id}/${action}`,
+      await api.put(
+        `/admin/restaurants/${id}/${action}`,
         { reason: blockModal.reason },
         authHeaders
       );

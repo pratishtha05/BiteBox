@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useParams, Link } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const DeliveryPartnerOrders = () => {
   const { token } = useAuth();
@@ -21,12 +19,10 @@ const DeliveryPartnerOrders = () => {
       setLoading(true);
       setError(null);
 
-      const res = await axios.get(
-        `${SERVER_URL}/delivery-partners/${partnerId}/orders`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await api.get(`/delivery-partners/${partnerId}/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         }
       );
 

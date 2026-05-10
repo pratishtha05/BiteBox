@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { Heart, MessageCircle, Send, ChevronDown, Music, MoreHorizontal } from "lucide-react";
 
 const Reels = () => {
@@ -10,7 +10,7 @@ const Reels = () => {
   useEffect(() => {
     const fetchReels = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/reels");
+        const res = await api.get("/public/reels");
         setReels(res.data.reels || []);
       } catch (err) {
         console.error(err);

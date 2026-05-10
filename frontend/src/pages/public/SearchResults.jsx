@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
@@ -9,8 +9,6 @@ import {
   ArrowRight,
   Clock,
 } from "lucide-react";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const SearchResults = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -30,7 +28,7 @@ const SearchResults = () => {
     const fetchResults = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${SERVER_URL}/public/search`, {
+        const res = await api.get("/public/search", {
           params: { q: query },
         });
         const data = res.data?.data || {};

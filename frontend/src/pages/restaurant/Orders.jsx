@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import axios from "axios";
 import { Calendar, ChevronRight, Clock, Package, User, MapPin, Search, Hash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const STATUS_FLOW = ["placed", "accepted", "preparing", "out for delivery", "completed"];
 
@@ -34,8 +31,8 @@ const Orders = () => {
   const fetchData = useCallback(async () => {
     try {
       const [ordRes, partRes] = await Promise.all([
-        axios.get(`${SERVER_URL}/orders/restaurant`, authHeaders),
-        axios.get(`${SERVER_URL}/delivery-partners/available`, authHeaders),
+        api.get("/orders/restaurant", authHeaders),
+        api.get("/delivery-partners/available", authHeaders),
       ]);
       setOrders(ordRes.data.data || []);
       setPartners(partRes.data.data || []);
@@ -62,7 +59,7 @@ const Orders = () => {
   const updateStatus = async (orderId, status) => {
     try {
       setUpdatingOrderId(orderId);
-      await axios.put(`${SERVER_URL}/orders/${orderId}/status`, { status }, authHeaders);
+      await api.put(`/orders/${orderId}/status`, { status }, authHeaders);
       await fetchData();
     } finally {
       setUpdatingOrderId(null);
@@ -72,7 +69,7 @@ const Orders = () => {
   const assignPartner = async (orderId, partnerId) => {
     if (!partnerId) return;
     setUpdatingOrderId(orderId);
-    await axios.put(`${SERVER_URL}/orders/${orderId}/assign-delivery`, { deliveryPartnerId: partnerId }, authHeaders);
+    await api.put(`/orders/${orderId}/assign-delivery`, { deliveryPartnerId: partnerId }, authHeaders);
     await fetchData();
     setUpdatingOrderId(null);
   };

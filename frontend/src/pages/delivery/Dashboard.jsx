@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000";
 
 const DeliveryDashboard = () => {
   const { token } = useAuth();
@@ -22,10 +20,7 @@ const DeliveryDashboard = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get(
-        `${SERVER_URL}/orders/delivery/my-orders`,
-        authHeaders
-      );
+      const res = await api.get("/orders/delivery/my-orders", authHeaders);
 
       setOrders(res.data?.data || []);
     } catch (err) {
@@ -42,8 +37,8 @@ const DeliveryDashboard = () => {
 
   const updateStatus = async (orderId, status) => {
     try {
-      await axios.put(
-        `${SERVER_URL}/orders/${orderId}/delivery-status`,
+      await api.put(
+        `/orders/${orderId}/delivery-status`,
         { deliveryStatus: status },
         authHeaders
       );

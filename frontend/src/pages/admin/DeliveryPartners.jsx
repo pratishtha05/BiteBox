@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { ChevronDown } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
-
 
 const DeliveryPartners = () => {
   const { token } = useAuth();
@@ -38,10 +35,7 @@ const DeliveryPartners = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get(
-        `${SERVER_URL}/admin/delivery-partners`,
-        authHeaders
-      );
+      const res = await api.get("/admin/delivery-partners", authHeaders);
 
       setPartners(res.data.data || []);
     } catch (err) {
@@ -58,8 +52,8 @@ const DeliveryPartners = () => {
     }
 
     try {
-      await axios.put(
-        `${SERVER_URL}/admin/delivery-partners/${partnerId}/${action}`,
+      await api.put(
+        `/admin/delivery-partners/${partnerId}/${action}`,
         { reason: blockModal.reason },
         authHeaders
       );

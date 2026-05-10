@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { Mail, Phone, MapPin, Send, MessageSquare, CheckCircle2, AlertCircle } from "lucide-react";
-
-const SERVER_URL = "http://localhost:3000/api/v1/public";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -21,7 +19,7 @@ const Contact = () => {
     setStatus({ message: "", error: false, visible: false, loading: true });
 
     try {
-      const res = await axios.post(`${SERVER_URL}/contact`, form);
+      const res = await api.post("/public/contact", form);
       setStatus({
         message: res.data.message || "Message sent successfully!",
         error: false,

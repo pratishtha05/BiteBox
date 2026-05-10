@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 /* =========================
    Delivery Partners
@@ -30,10 +28,7 @@ const DeliveryPartners = () => {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get(
-          `${SERVER_URL}/delivery-partners/available`,
-          authHeaders
-        );
+        const res = await api.get("/delivery-partners/available", authHeaders);
 
         setPartners(res.data.data || []);
       } catch (err) {

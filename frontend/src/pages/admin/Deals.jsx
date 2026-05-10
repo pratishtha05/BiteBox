@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import {
   Pencil,
   Trash2,
@@ -9,8 +9,6 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const initialFormState = {
   title: "",
@@ -35,8 +33,7 @@ const Deals = () => {
 
   const api = useMemo(
     () =>
-      axios.create({
-        baseURL: SERVER_URL,
+      api.create({
         headers: { Authorization: `Bearer ${token}` },
       }),
     [token]

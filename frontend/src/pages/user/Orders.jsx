@@ -1,10 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import { ShoppingBag, ChevronRight, AlertCircle, Bike, CheckCircle2, UtensilsCrossed } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const getStatusStyles = (status) => {
   switch (status.toLowerCase()) {
@@ -41,7 +39,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${SERVER_URL}/orders/me`, authHeaders);
+        const res = await api.get("/orders/me", authHeaders);
         setOrders(res.data.data || []);
       } catch (err) {
         setError("Unable to sync your orders.");

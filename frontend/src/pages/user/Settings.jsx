@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { Eye, EyeOff, User, Shield, Trash2, CheckCircle, AlertCircle, Camera, Edit3, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const Settings = () => {
   const { role, token } = useAuth();
@@ -31,7 +29,7 @@ const Settings = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/${role}/me`, authHeaders);
+        const res = await api.get(`/${role}/me`, authHeaders);
         setForm(res.data.data);
         originalForm.current = res.data.data;
       } catch (err) {

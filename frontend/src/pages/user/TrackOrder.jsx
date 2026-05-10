@@ -1,13 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/api";
 import {
   Package, CheckCircle2, Clock, Truck, 
   MapPin, Phone, Receipt, ChevronLeft, ArrowRight
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const STATUS_FLOW = [
   { key: "placed", label: "Placed", desc: "Order received", icon: Package },
@@ -27,7 +25,7 @@ const TrackOrder = () => {
   const fetchOrder = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await axios.get(`${SERVER_URL}/orders/${orderId}`, {
+      const res = await api.get(`/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrder(res.data.data);

@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/api";
 import { CheckCircle, ChevronLeft, ShoppingBag, ReceiptText, MapPin, ArrowRight } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const Confirmation = () => {
   const navigate = useNavigate();
@@ -33,7 +31,7 @@ const Confirmation = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.post(`${SERVER_URL}/orders`, { restaurantId, items, totalAmount }, authHeaders);
+      const res = await api.post("/orders", { restaurantId, items, totalAmount }, authHeaders);
       clearCart();
       setOrder(res.data.data);
       setConfirmed(true);

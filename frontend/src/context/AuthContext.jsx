@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 
 const AuthContext = createContext(null);
 
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (role, payload) => {
     try {
-      const res = await axios.post(`http://localhost:3000/api/v1/auth/${role}/login`, payload);
+      const res = await api.post(`/auth/${role}/login`, payload);
       
      
       const { token, user, restaurant, admin, delivery } = res.data.data;
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         ? { headers: { "Content-Type": "multipart/form-data" } }
         : {};
 
-      const res = await axios.post(`http://localhost:3000/api/v1/auth/${role}/signup`, payload, config);
+      const res = await api.post(`/auth/${role}/signup`, payload, config);
 
       // Automatically login after successful signup
       let loginPayload;

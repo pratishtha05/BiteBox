@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Tag, ArrowRight, Clock, AlertCircle } from "lucide-react";
 
-const SERVER_URL = "http://localhost:3000/api/v1/public";
-
 const Deals = () => {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);

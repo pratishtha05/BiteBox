@@ -1,11 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { ChevronLeft, ShoppingBag, Info} from "lucide-react";
-
-const SERVER_URL = "http://localhost:3000/api/v1/public";
 
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
@@ -23,7 +21,7 @@ const RestaurantMenu = () => {
     const fetchMenu = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${SERVER_URL}/menu/${restaurantId}`);
+        const res = await api.get(`/public/menu/${restaurantId}`);
         setMenu(res.data.data || []);
       } catch (err) {
         setError("Unable to load menu. Please try again.");

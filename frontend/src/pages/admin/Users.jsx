@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { ChevronDown, User } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
 
 const Users = () => {
   const { token } = useAuth();
@@ -32,7 +30,7 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${SERVER_URL}/admin/users`, authHeaders);
+      const res = await api.get("/admin/users", authHeaders);
       setUsers(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -56,10 +54,10 @@ const Users = () => {
     }
 
     try {
-      await axios.put(
-        `${SERVER_URL}/admin/users/${userId}/${action}`,
+      await api.put(
+        `/admin/users/${userId}/${action}`,
         { reason: blockModal.reason },
-        authHeaders,
+        authHeaders
       );
 
       showMessage(`User ${action}ed successfully`);
@@ -78,10 +76,7 @@ const Users = () => {
     }
 
     try {
-      const res = await axios.get(
-        `${SERVER_URL}/admin/users/${userId}/orders`,
-        authHeaders,
-      );
+      const res = await api.get(`/admin/users/${userId}/orders`, authHeaders);
       console.log(res.data.data);
       setOrdersByUser((prev) => ({
         ...prev,

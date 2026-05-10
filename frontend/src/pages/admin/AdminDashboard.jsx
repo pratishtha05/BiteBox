@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -11,9 +10,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-
-const SERVER_URL = "http://localhost:3000/api/v1";
-
+import api from "../../utils/api";
 
 const StatCard = ({ title, value, icon: Icon }) => (
   <div className="rounded-2xl border border-gray-200 bg-white p-5 flex items-center justify-between shadow-sm hover:shadow-md transition">
@@ -51,8 +48,8 @@ const AdminDashboard = () => {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get(
-          `${SERVER_URL}/admin/dashboard`,
+        const res = await api.get(
+          "/admin/dashboard",
           authHeaders
         );
 
