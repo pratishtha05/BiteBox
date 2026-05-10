@@ -68,8 +68,10 @@ const attachImageUrl = (item) => {
 
   const obj = typeof item.toObject === "function" ? item.toObject() : { ...item };
 
-  if (obj.image && !obj.image.startsWith('http')) {
-    obj.image = `${process.env.SERVER_URL}${obj.image}`;
+  const base = process.env.SERVER_URL?.replace(/\/$/, "");
+
+  if (obj.image && !obj.image.startsWith("http")) {
+    obj.image = `${base}${obj.image.startsWith("/") ? obj.image : `/${obj.image}`}`;
   }
   
   return obj;
