@@ -68,7 +68,7 @@ const Dashboard = () => {
         console.log("DATA:", res.data);
 
         setRestaurants(
-          res?.data?.data?.restaurants || []
+          res?.data?.data || []
         );
       } catch (err) {
         console.error(err);

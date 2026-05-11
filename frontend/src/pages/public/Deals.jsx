@@ -88,7 +88,7 @@ const Deals = () => {
                   {/* Image Box */}
                   <div className="relative h-40 sm:h-44 bg-slate-50 overflow-hidden">
                     <img
-                      src={deal.image}
+                      src={deal.image || "https://via.placeholder.com/400x300?text=No+Image"}
                       alt={deal.title}
                       className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                     />

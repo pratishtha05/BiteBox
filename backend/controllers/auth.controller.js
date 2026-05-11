@@ -105,7 +105,7 @@ exports.restaurantSignup = async (req, res, next) => {
       phone,
       address,
       categories: Array.isArray(categories) ? categories : [categories],
-      image: req.file ? `/uploads/${req.file.filename}` : "",
+      image: req.file ? req.file.path : "",
     });
 
     const token = generateToken({ id: restaurant._id, role: "restaurant" });

@@ -5,7 +5,7 @@ const User = require("../models/user.model");
 exports.getProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.auth.id).select("-password");
-    res.json({ success: true, data: attachImageUrl(user) });
+    res.json({ success: true, data: user });
   } catch (err) {
     next(err);
   }
@@ -18,7 +18,7 @@ exports.updateProfile = async (req, res, next) => {
 
     // If a new file is uploaded, update the image path
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      updateData.image = req.file?.path;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -27,7 +27,7 @@ exports.updateProfile = async (req, res, next) => {
       { new: true }
     ).select("-password");
 
-    res.json({ success: true, data: attachImageUrl(updatedUser) });
+    res.json({ success: true, data: updatedUser });
   } catch (err) {
     next(err);
   }
@@ -59,10 +59,4 @@ exports.deleteAccount = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-const attachImageUrl = (user) => {
-  const obj = user.toObject();
-  obj.image = obj.image ? `${process.env.SERVER_URL}${obj.image}` : "";
-  return obj;
 };

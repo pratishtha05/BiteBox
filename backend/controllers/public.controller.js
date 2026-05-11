@@ -48,31 +48,16 @@ exports.getRestaurants = async (req, res, next) => {
     const restaurants = await Restaurant.find(filter)
       .select("-password")
       .sort({ createdAt: -1 });
-    const restaurantsWithImages = restaurants.map(attachImageUrl);
-
     res.json({
       success: true,
       data: {
         count: restaurants.length,
-        restaurants: restaurantsWithImages,
+        restaurants,
       },
     });
   } catch (err) {
     next(err);
   }
-};
-
-// Helper to attach full image URL
-const attachImageUrl = (item) => {
-  if (!item) return item;
-
-  const obj = typeof item.toObject === "function" ? item.toObject() : { ...item };
-
-  if (obj.image && !obj.image.startsWith('http')) {
-    obj.image = `${process.env.SERVER_URL}${obj.image}`;
-  }
-  
-  return obj;
 };
 
 // Search across Restaurants, Menu Items, and Categories
@@ -87,37 +72,39 @@ exports.search = async (req, res, next) => {
       });
     }
 
-    const [restaurantsByName, restaurantsByCategory, foods] = await Promise.all([
-      Restaurant.find({
-        isBlocked: false,
-        name: { $regex: query, $options: "i" },
-      }),
-      Restaurant.find({
-        isBlocked: false,
-        categories: { $regex: query, $options: "i" },
-      }),
-      MenuItem.find({
-        name: { $regex: query, $options: "i" },
-        isAvailable: true,
-        isDeleted: false,
-      }).populate("restaurant", "name image categories"),
-    ]);
+    const [restaurantsByName, restaurantsByCategory, foods] = await Promise.all(
+      [
+        Restaurant.find({
+          isBlocked: false,
+          name: { $regex: query, $options: "i" },
+        }),
+        Restaurant.find({
+          isBlocked: false,
+          categories: { $regex: query, $options: "i" },
+        }),
+        MenuItem.find({
+          name: { $regex: query, $options: "i" },
+          isAvailable: true,
+          isDeleted: false,
+        }).populate("restaurant", "name image categories"),
+      ],
+    );
 
     // 1. Process Restaurants: Merge results and attach image URLs
     const restaurantMap = new Map();
     [...restaurantsByName, ...restaurantsByCategory].forEach((r) => {
       // Use helper here
-      restaurantMap.set(r._id.toString(), attachImageUrl(r));
+      restaurantMap.set(r._id.toString(), r);
     });
 
     // 2. Process Foods: Attach image URLs for both the food and its parent restaurant
     const processedFoods = foods.map((item) => {
-      const foodObj = attachImageUrl(item);
-      
-      // If the restaurant field is populated, attach its image URL too
-      if (foodObj.restaurant) {
-        foodObj.restaurant = attachImageUrl(foodObj.restaurant);
+      const foodObj = item.toObject();
+
+      if (foodObj.restaurant && typeof foodObj.restaurant === "object") {
+        foodObj.restaurant = foodObj.restaurant;
       }
+
       return foodObj;
     });
 
@@ -147,7 +134,7 @@ exports.getActiveDeals = async (req, res, next) => {
     // Deactivate expired deals
     await Deal.updateMany(
       { isActive: true, validTill: { $lt: now } },
-      { $set: { isActive: false } }
+      { $set: { isActive: false } },
     );
 
     // Fetch active deals
@@ -157,11 +144,9 @@ exports.getActiveDeals = async (req, res, next) => {
     }).sort({ createdAt: -1 });
 
     // Attach full image URLs
-    const dealsWithImages = deals.map(attachImageUrl);
-
     res.json({
       success: true,
-      data: dealsWithImages,
+      data: deals,
     });
   } catch (err) {
     next(err);

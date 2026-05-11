@@ -10,7 +10,7 @@ exports.getMyMenu = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: items.map(attachImageUrl),
+      data: items,
     });
   } catch (err) {
     next(err);
@@ -22,12 +22,12 @@ exports.createMenuItem = async (req, res, next) => {
     const item = await MenuItem.create({
       ...req.body,
       restaurant: req.auth.id,
-      image: req.file ? `/uploads/${req.file.filename}` : "",
+      image: req.file ? req.file.path : "",
     });
 
     res.status(201).json({
       success: true,
-      data: attachImageUrl(item),
+      data: item,
     });
   } catch (err) {
     next(err);
@@ -38,7 +38,7 @@ exports.updateMenuItem = async (req, res, next) => {
   try {
     const updateData = { ...req.body };
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      updateData.image = req.file?.path;
     }
 
     const item = await MenuItem.findOneAndUpdate(
@@ -56,7 +56,7 @@ exports.updateMenuItem = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: attachImageUrl(item),
+      data: item,
     });
   } catch (err) {
     next(err);
@@ -90,18 +90,9 @@ exports.getRestaurantMenu = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: items.map(attachImageUrl),
+      data: items,
     });
   } catch (err) {
     next(err);
   }
-};
-
-// Helper to attach full image URL
-const attachImageUrl = (item) => {
-  const obj = item.toObject();
-  obj.image = obj.image
-    ? `${process.env.SERVER_URL}${obj.image}`
-    : "";
-  return obj;
 };
