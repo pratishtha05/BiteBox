@@ -58,7 +58,7 @@ const Dashboard = () => {
       try {
         const url = selectedCategory
           ? `/public/restaurants?category=${encodeURIComponent(
-              selectedCategory
+              selectedCategory,
             )}`
           : `/public/restaurants`;
 
@@ -67,9 +67,15 @@ const Dashboard = () => {
         console.log("FULL RESPONSE:", res);
         console.log("DATA:", res.data);
 
-        setRestaurants(
-          res?.data?.data || []
-        );
+        const apiData = res?.data?.data;
+
+        const normalized = Array.isArray(apiData)
+          ? apiData
+          : Array.isArray(apiData?.restaurants)
+            ? apiData.restaurants
+            : [];
+
+        setRestaurants(normalized);
       } catch (err) {
         console.error(err);
       } finally {
@@ -80,17 +86,10 @@ const Dashboard = () => {
     fetchRestaurants();
   }, [selectedCategory]);
 
-  const getCategoryIcon = (
-    name,
-    size = 24
-  ) => {
-    const Icon =
-      categoryIcons[name?.toLowerCase()] ||
-      categoryIcons.default;
+  const getCategoryIcon = (name, size = 24) => {
+    const Icon = categoryIcons[name?.toLowerCase()] || categoryIcons.default;
 
-    return (
-      <Icon size={size} strokeWidth={1.8} />
-    );
+    return <Icon size={size} strokeWidth={1.8} />;
   };
 
   const scroll = (dir) => {
@@ -134,17 +133,12 @@ const Dashboard = () => {
             className="flex gap-6 sm:gap-8 md:gap-12 overflow-x-auto hide-scrollbar scroll-smooth py-2"
           >
             {categories.map((cat) => {
-              const active =
-                selectedCategory === cat.name;
+              const active = selectedCategory === cat.name;
 
               return (
                 <button
                   key={cat.name}
-                  onClick={() =>
-                    setSelectedCategory(
-                      active ? null : cat.name
-                    )
-                  }
+                  onClick={() => setSelectedCategory(active ? null : cat.name)}
                   className="shrink-0 group flex flex-col items-center gap-2 min-w-[72px]"
                 >
                   <div
@@ -156,17 +150,13 @@ const Dashboard = () => {
                   >
                     {getCategoryIcon(
                       cat.name,
-                      window.innerWidth < 640
-                        ? 24
-                        : 32
+                      window.innerWidth < 640 ? 24 : 32,
                     )}
                   </div>
 
                   <span
                     className={`text-[10px] sm:text-[11px] text-center font-bold uppercase tracking-wider leading-tight ${
-                      active
-                        ? "text-amber-600"
-                        : "text-slate-500"
+                      active ? "text-amber-600" : "text-slate-500"
                     }`}
                   >
                     {cat.name}
@@ -203,20 +193,12 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-x-5 sm:gap-x-6 gap-y-7 sm:gap-y-10">
             {restaurants
               .filter((r) =>
-                r.name
-                  .toLowerCase()
-                  .includes(
-                    searchTerm.toLowerCase()
-                  )
+                r.name.toLowerCase().includes(searchTerm.toLowerCase()),
               )
               .map((restaurant) => (
                 <div
                   key={restaurant._id}
-                  onClick={() =>
-                    navigate(
-                      `/menu/${restaurant._id}`
-                    )
-                  }
+                  onClick={() => navigate(`/menu/${restaurant._id}`)}
                   className="group cursor-pointer bg-white rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-slate-100 transition-all hover:shadow-xl hover:-translate-y-1 shadow-sm"
                 >
                   <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
@@ -240,20 +222,15 @@ const Dashboard = () => {
           </div>
         )}
 
-        {!loading &&
-          restaurants.length === 0 && (
-            <div className="text-center py-14 sm:py-20 px-4 bg-white rounded-[2rem] sm:rounded-[3rem] border border-dashed border-slate-200">
-              <Utensils
-                size={48}
-                className="mx-auto text-slate-200 mb-4"
-              />
+        {!loading && restaurants.length === 0 && (
+          <div className="text-center py-14 sm:py-20 px-4 bg-white rounded-[2rem] sm:rounded-[3rem] border border-dashed border-slate-200">
+            <Utensils size={48} className="mx-auto text-slate-200 mb-4" />
 
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] sm:text-xs leading-relaxed">
-                No restaurants found in this
-                category
-              </p>
-            </div>
-          )}
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] sm:text-xs leading-relaxed">
+              No restaurants found in this category
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
