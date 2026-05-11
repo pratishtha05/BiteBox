@@ -76,7 +76,7 @@ const Auth = () => {
           payload.append("address", formData.address);
 
           formData.categories.forEach((cat) =>
-            payload.append("categories[]", cat)
+            payload.append("categories[]", cat),
           );
 
           if (formData.image) payload.append("image", formData.image);
@@ -97,12 +97,9 @@ const Auth = () => {
 
           await signup(formData.role, payload);
 
-          navigate(
-            formData.role === "delivery"
-              ? "/delivery/dashboard"
-              : "/",
-            { replace: true }
-          );
+          navigate(formData.role === "delivery" ? "/delivery/dashboard" : "/", {
+            replace: true,
+          });
         }
       } else {
         payload = {
@@ -122,9 +119,7 @@ const Auth = () => {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Something went wrong"
+        err.response?.data?.message || err.message || "Something went wrong",
       );
     } finally {
       setLoading(false);
@@ -284,6 +279,25 @@ const Auth = () => {
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg focus:border-amber-500 outline-none text-sm transition-all"
                     />
                   </div>
+                  {(formData.role === "user" || formData.role === "admin") && (
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Gender
+                      </label>
+
+                      <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg focus:border-amber-500 outline-none text-sm transition-all"
+                        required
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -336,11 +350,7 @@ const Auth = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-amber-500 hover:cursor-pointer"
                   >
-                    {showPassword ? (
-                      <EyeOff size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
@@ -357,14 +367,15 @@ const Auth = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => {
-                          const exists =
-                            formData.categories.includes(cat.value);
+                          const exists = formData.categories.includes(
+                            cat.value,
+                          );
 
                           setFormData({
                             ...formData,
                             categories: exists
                               ? formData.categories.filter(
-                                  (c) => c !== cat.value
+                                  (c) => c !== cat.value,
                                 )
                               : [...formData.categories, cat.value],
                           });
@@ -391,8 +402,8 @@ const Auth = () => {
               {loading
                 ? "Processing..."
                 : isSignup
-                ? "Create Account"
-                : "Sign In"}
+                  ? "Create Account"
+                  : "Sign In"}
             </button>
           </form>
         </div>
